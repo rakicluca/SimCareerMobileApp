@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "username": "Er Cobra",
+    "email": "email@email.com",
+    "password": "passwordHashata",
+    "nome": "Roberto",
+    "cognome": "Cosi",
+    "data_nascita": "",
+    "residenza": "",
+    "imgUtente": "img/linkToDirectory",
+    "numero_in_gara_preferito": 7,
+    "id_numero_circuito_preferito": 1,
+    "id_numero_circuito_odiato": 2,
+    "id_auto_preferita": 1
+  },
+  {
+    "id": 2,
+    "username": "Er Cbra",
+    "email": "email@emaail.com",
+    "password": "passwordHashata",
+    "nome": "Giacomo",
+    "cognome": "Lapadula",
+    "data_nascita": "",
+    "residenza": "",
+    "imgUtente": "img/linkToDirectory",
+    "numero_in_gara_preferito": 7,
+    "id_numero_circuito_preferito": 1,
+    "id_numero_circuito_odiato": 2,
+    "id_auto_preferita": 1
+  }
+]

@@ -1,0 +1,28 @@
+{
+  "circuiti": [
+    {
+      "idCircuito": 1,
+      "nome": "Jerez",
+      "km": 3,
+      "meteo": "Soleggiato"
+    },
+    {
+      "idCircuito": 2,
+      "nome": "Jerez",
+      "km": 1,
+      "meteo": "Nuvoloso"
+    },
+    {
+      "idCircuito": 3,
+      "nome": "Barcellona",
+      "km": 1.3,
+      "meteo": "Pioggia"
+    },
+    {
+      "idCircuito": 4,
+      "nome": "Valencia",
+      "km": 1.8,
+      "meteo": "Neve"
+    }
+  ]
+}
