@@ -13,8 +13,17 @@ router.get('/',(req,res,next)=>{
     const team = getAllTeam();
     res.status(200).json(team);
 });
-module.exports = router;
+router.get('/:idTeam',(req,res,next)=>{
+    let teams = getAllTeam();
+    let teamIndex = getTeamById(req.params.idTeam,teams)
+    if(teamIndex!=-1)
+      res.status(200).json(teams[teamIndex]);
+      else {
+        res.status(500).json([]);
+      }
+});
 
+module.exports = router;
 
 function getAllTeam() {
   rawdata = fs.readFileSync('DB/team.json');
@@ -22,4 +31,13 @@ function getAllTeam() {
     return ([]);
   else
     return JSON.parse(rawdata);
+}
+
+function getTeamById(idTeam,teams) {
+    let index=-1;
+    for (let i = 0; i < teams.length; i++) {
+      if(idTeam==teams[i].idTeam)
+          index=i;
+    }
+    return index;
 }

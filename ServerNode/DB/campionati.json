@@ -1,5 +1,4 @@
-{
-  "campionati": [
+[
     {
       "id": "0",
       "nome": "Leon Supercopa",
@@ -8,22 +7,22 @@
         {
           "seq": "1",
           "data": "04/07/2019",
-          "circuito": "Jerez"
+          "idCircuito": 1
         },
         {
           "seq": "2",
           "data": "11/07/2019",
-          "circuito": "Barcellona"
+          "idCircuito": 2
         },
         {
           "seq": "3",
           "data": "18/07/2019",
-          "circuito": "Valencia"
+          "idCircuito": 3
         },
         {
           "seq": "4",
           "data": "25/07/2019",
-          "circuito": "Portimao"
+          "idCircuito": 4
         }
       ],
       "impostazioni-gioco": [
@@ -49,32 +48,38 @@
         {
           "nome": "Roberto Cosi",
           "team": "Busters eRacing Team",
-          "auto": "Seat Leon"
+          "auto": "Seat Leon",
+          "tempi": ["1:00:000","1:00:000","1:00:000","1:00:000"]
         },
         {
           "nome": "Giacomo Lapadula",
           "team": "Naja Racing Italia",
-          "auto": "Seat Leon"
+          "auto": "Seat Leon",
+          "tempi": ["1:00:000","1:00:000","1:00:000","1:00:000"]
         },
         {
           "nome": "Andrea Crespi",
           "team": "Handy Racing Team",
-          "auto": "Seat Leon"
+          "auto": "Seat Leon",
+          "tempi": ["1:00:000","1:00:000","1:00:000","1:00:000"]
         },
         {
           "nome": "Gennaro Deiulis",
           "team": "Team SSD",
-          "auto": "Seat Leon"
+          "auto": "Seat Leon",
+          "tempi": ["1:00:000","1:00:000","1:00:000","1:00:000"]
         },
         {
           "nome": "Fabio Narduzzo",
           "team": "Busters eRacing Team",
-          "auto": "Seat Leon"
+          "auto": "Seat Leon",
+          "tempi": ["1:00:000","1:00:000","1:00:000","1:00:000"]
         },
         {
           "nome": "Roberto Contino",
           "team": "Handy Racing Team",
-          "auto": "Seat Leon"
+          "auto": "Seat Leon",
+          "tempi": ["1:00:000","1:00:000","1:00:000","1:00:000"]
         }
       ]
     },
@@ -86,37 +91,37 @@
         {
           "seq": "1",
           "data": "30/01/2020",
-          "circuito": "Sepang"
+          "idCircuito": "Sepang"
         },
         {
           "seq": "2",
           "data": "13/02/2020",
-          "circuito": "Buriram"
+          "idCircuito": "Buriram"
         },
         {
           "seq": "3",
           "data": "27/02/2020",
-          "circuito": "Suzuka"
+          "idCircuito": "Suzuka"
         },
         {
           "seq": "4",
           "data": "12/03/2020",
-          "circuito": "Zhejiang"
+          "idCircuito": "Zhejiang"
         },
         {
           "seq": "5",
           "data": "26/03/2020",
-          "circuito": "Zandvoort"
+          "idCircuito": "Zandvoort"
         },
         {
           "seq": "6",
           "data": "09/04/2020",
-          "circuito": "Hungaroring"
+          "idCircuito": "Hungaroring"
         },
         {
           "seq": "7",
           "data": "23/05/2020",
-          "circuito": "Adria"
+          "idCircuito": "Adria"
         }
       ],
       "impostazioni-gioco": [
@@ -142,34 +147,39 @@
         {
           "nome": "Gianluca De Matteo",
           "team": "Busters eRacing Team",
-          "auto": "Honda Civic"
+          "auto": "Honda Civic",
+          "tempi": ["1:00:000","1:00:000","1:00:000","1:00:000"]
         },
         {
           "nome": "Claudio Gasperini",
           "team": "Panzer Team",
-          "auto": "Peugeot 308"
+          "auto": "Peugeot 308",
+          "tempi": ["1:00:000","1:00:000","1:00:000","1:00:000"]
         },
         {
           "nome": "Marco Mazzetti",
           "team": "Handy Racing Team",
-          "auto": "VW Golf"
+          "auto": "VW Golf",
+          "tempi": ["1:00:000","1:00:000","1:00:000","1:00:000"]
         },
         {
           "nome": "Dario Raffaeta",
           "team": "Indipendente",
-          "auto": "Alfa Romeo Giulietta"
+          "auto": "Alfa Romeo Giulietta",
+          "tempi": ["1:00:000","1:00:000","1:00:000","1:00:000"]
         },
         {
           "nome": "Ugo Federico Bagnasco",
           "team": "Busters eRacing Team",
-          "auto": "Honda Civic"
+          "auto": "Honda Civic",
+          "tempi": ["1:00:000","1:00:000","1:00:000","1:00:000"]
         },
         {
           "nome": "Enrico Sancini",
           "team": "Handy Racing Team",
-          "auto": "VW Golf"
+          "auto": "VW Golf",
+          "tempi": ["1:00:000","1:00:000","1:00:000","1:00:000"]
         }
       ]
     }
-  ]
-}
+]

@@ -1,5 +1,4 @@
-{
-  "teams":[
+[
     {
       "idTeam": 1,
       "nome": "Naja Racing Italia"
@@ -16,5 +15,4 @@
       "idTeam": 4,
       "nome": "Team SSD"
     }
-  ]
-}
+]

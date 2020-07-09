@@ -13,6 +13,16 @@ router.get('/',(req,res,next)=>{
     const champ = getAllCampionati();
     res.status(200).json(champ);
 });
+router.get('/:idCampionato',(req,res,next)=>{
+    const campionati = getAllCampionati();
+    let indexCampionato = getCampionatoById(req.params.idCampionato,campionati);
+    if(indexCampionato!=-1)
+      res.status(200).json(campionati[indexCampionato]);
+      else {
+        res.status(500).json([]);
+      }
+});
+
 module.exports = router;
 
 
@@ -22,4 +32,13 @@ function getAllCampionati() {
     return ([]);
   else
     return JSON.parse(rawdata);
+}
+
+function getCampionatoById(idCampionato,campionati) {
+    let index=-1;
+    for (let i = 0; i < campionati.length; i++) {
+      if(idCampionato==campionati[i].id)
+          index=i;
+    }
+    return index;
 }

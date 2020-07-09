@@ -1,24 +1,22 @@
-{
-  "auto": [
+[
     {
-      "id": 1,
+      "idAuto": 1,
       "nome": "VW Golf"
     },
     {
-      "id": 2,
+      "idAuto": 2,
       "nome": "Honda Civic"
     },
     {
-      "id": 3,
+      "idAuto": 3,
       "nome": "Peugeot 308"
     },
     {
-      "id": 4,
+      "idAuto": 4,
       "nome": "Hyundai i30n"
     },
     {
-      "id": 5,
+      "idAuto": 5,
       "nome": "Alfa Romeo Giulietta"
     }
-  ]
-}
+]

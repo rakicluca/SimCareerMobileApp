@@ -11,15 +11,23 @@ app.use(bodyParser.json());
 
 router.get('/',(req,res,next)=>{
     const utenti = getAllUtenti();
-    res.status(200).json(req.body[0].nome);
+    res.status(200).json(utenti);
+});
+router.get('/:idUtente',(req,res,next)=>{
+    const utenti = getAllUtenti();
+    let index = getOneUtenteById(req.params.idUtente,utenti);
+    if(index != -1 )
+      res.status(200).json(utenti[index]);
+      else {
+        res.status(404).json([])
+      }
 });
 
 router.post('/',(req,res,next)=>{
-  let bdy = req.body;
   const utenti = getAllUtenti();
   const alreadyUtenteEmail = findUtenteEmail(req.body[0].email, utenti);
   const alreadyUtenteUsername = findUtenteUsername(req.body[0],utenti);
-  let check = addUtente(bdy);
+  let check = addUtente(req.body);
   if(check)
     res.status(201).send("Utente aggiunto!");
     else{
@@ -29,11 +37,21 @@ router.post('/',(req,res,next)=>{
 
 });
 
-//Handler modifica prodotto
-router.put('/',(req,res,next)=>{
-  let tmp = modifyUtente(req.body);
-  if(tmp==true)
+//Handler modifica utente
+router.put('/:utenteUsername',(req,res,next)=>{
+  let tmp = modifyUtente(req.params.utenteUsername,req.body);
+  if(tmp[0]==false && tmp[1]==false && tmp[2]==false)
     res.status(201).send("Utente modificato!");
+    else{
+      res.status(404).send(tmp);
+    }
+});
+
+//Handler elimina utente
+router.delete('/',(req,res,next)=>{
+  let tmp = deleteUtente(req.body);
+  if(tmp==true)
+    res.status(201).send("Utente eliminato con successo!");
     else {
       res.status(404).send("Qualcosa è andato storto. Utente non trovato!");
     }
@@ -56,6 +74,15 @@ function findUtenteEmail(utenteEmail,utenti){
 
 function findUtenteUsername(utenteUsername,utenti) {
   return utenti.find(p => p.username === utenteUsername.username)
+}
+
+function getOneUtenteById(idUtente,utenti) {
+  let index=-1;
+  for (let i = 0; i < utenti.length; i++) {
+    if(idUtente==utenti[i].id)
+        index=i;
+  }
+  return index;
 }
 
 /*Aggiunge un prodotto al nostro "db" che è un file JSON.
@@ -113,105 +140,126 @@ function addUtente(utente){
   ritorna una variabile bool per controllare eventuali errori
 */
 
-function modifyUtente(utente){
+function modifyUtente(utenteUsername,utente){
   let rawdata = fs.readFileSync('DB/utenti.json');
-  let success = false;
-  let check = false;
+  let success = [false,false,false]; //[0] -> email, [1] -> username, [2] -> usernameNonEsiste
   const utenti = getAllUtenti();
   rawdata = JSON.parse(rawdata);
   for (var i = 0; i < rawdata.length; i++) {
     for (var j = 0; j < utente.length; j++) {
-      if(utente[j].username.localeCompare(rawdata[i].username)===0){
-        //console.log(product[j]);
-        if(product[j].password==undefined)
+      if(utenteUsername.localeCompare(rawdata[i].username)===0){
+        if(utente[j].password=="")
         {
-          rawdata[i].password = "";
+
         }else {
-          rawdata[i].password = product[j].password;
+          rawdata[i].password = utente[j].password;
         }
-        if(product[j].nome==undefined)
+        if(utente[j].nome=="")
         {
-          rawdata[i].nome = "";
+
         }else {
-          rawdata[i].nome = product[j].nome;
+          rawdata[i].nome = utente[j].nome;
         }
-        if(product[j].cognome==undefined)
+        if(utente[j].cognome=="")
         {
-          rawdata[i].cognome = "";
+
         }else {
-          rawdata[i].cognome = product[j].cognome;
+          rawdata[i].cognome = utente[j].cognome;
         }
-        if(product[j].data_nascita==undefined)
+        if(utente[j].data_nascita=="")
         {
-          rawdata[i].data_nascita = "";
+
         }else {
-          rawdata[i].data_nascita = product[j].data_nascita;
+          rawdata[i].data_nascita = utente[j].data_nascita;
         }
-        if(product[j].residenza==undefined)
+        if(utente[j].residenza=="")
         {
-          rawdata[i].residenza = "";
+
         }else {
-          rawdata[i].residenza = product[j].residenza;
+          rawdata[i].residenza = utente[j].residenza;
         }
-        if(product[j].imgUtente==undefined)
+        if(utente[j].imgUtente=="")
         {
-          rawdata[i].imgUtente = "";
+
         }else {
-          rawdata[i].imgUtente = product[j].imgUtente;
+          rawdata[i].imgUtente = utente[j].imgUtente;
         }
-        if(product[j].numero_in_gara_preferito==undefined)
+        if(utente[j].numero_in_gara_preferito=="")
         {
-          rawdata[i].numero_in_gara_preferito = "";
+
         }else {
-          rawdata[i].numero_in_gara_preferito = product[j].numero_in_gara_preferito;
+          rawdata[i].numero_in_gara_preferito = utente[j].numero_in_gara_preferito;
         }
-        if(product[j].id_numero_circuito_odiato==undefined)
+        if(utente[j].id_numero_circuito_odiato=="")
         {
-          rawdata[i].id_numero_circuito_odiato = "";
+
         }else {
-          rawdata[i].id_numero_circuito_odiato = product[j].id_numero_circuito_odiato;
+          rawdata[i].id_numero_circuito_odiato = utente[j].id_numero_circuito_odiato;
         }
-        if(product[j].id_numero_circuito_preferito==undefined)
+        if(utente[j].id_numero_circuito_preferito=="")
         {
-          rawdata[i].id_numero_circuito_preferito = "";
+
         }else {
-          rawdata[i].id_numero_circuito_preferito = product[j].id_numero_circuito_preferito;
+          rawdata[i].id_numero_circuito_preferito = utente[j].id_numero_circuito_preferito;
         }
-        if(product[j].id_auto_preferita==undefined)
+        if(utente[j].id_auto_preferita=="")
         {
-          rawdata[i].id_auto_preferita = "";
+
         }else {
-          rawdata[i].id_auto_preferita = product[j].id_auto_preferita;
+          rawdata[i].id_auto_preferita = utente[j].id_auto_preferita;
         }
-        if(product[j].email==undefined)
+        if(utente[j].email=="")
         {
-          rawdata[i].email = "";
-        }else {
-          if(!findUtenteEmail(product[j].email,utenti))
-            rawdata[i].email = product[j].email;
-            else{
-              check=true;
+
+        }else{
+          if(utente[j].id != rawdata[i].id){
+            if(findUtenteEmail(utente[j],utenti)){
+              success[0]=true;
+            }
+            }else{
+              rawdata[i].email = utente[j].email;
+          }
+        }
+        if(utente[j].username=="")
+        {
+
+        }else{
+          if(utente[j].id != rawdata[i].id){
+          if(findUtenteUsername(utente[j],utenti)){
+            success[1]=true;
+          }
+          }else{
+              rawdata[i].username = utente[j].username;
             }
         }
-        if(product[j].username==undefined)
-        {
-          rawdata[i].username = "";
-        }else {
-          if(!findUtenteUsername(product[j].username,utenti))
-            rawdata[i].username = product[j].username;
-            else{
-              success=true;
-            }
-        }
-        if (!check) {
-          success=true;
-        }
+      }else {
+        success[2] = true;
       }
     }
   }
-  if (success) {
+  if (success[0]==false && success[1]==false && success[2]==false) {
     fs.writeFileSync('DB/utenti.json',JSON.stringify(rawdata,null,2),'utf8');
   }
+  return success;
+}
+
+function deleteUtente(utente){
+  let rawdata = fs.readFileSync('DB/utenti.json');
+  let success = false;
+  rawdata = JSON.parse(rawdata);
+  for (var i = 0; i < utente.length; i++) {
+    for (var j = 0; j < rawdata.length; j++) {
+      if(utente[i].id==rawdata[j].id){
+        rawdata.splice(j,1);
+        success=true;
+      }
+    }
+  }
+  if(rawdata.length!=0)
+    fs.writeFileSync('DB/utenti.json',JSON.stringify(rawdata,null,2),'utf8');
+    else {
+      fs.writeFileSync('DB/utenti.json',"[]",'utf8');
+    }
   return success;
 }
 
