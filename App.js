@@ -1,11 +1,21 @@
+import RegForm from "./app/components/RegForm";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { useFonts } from "@use-expo/font";
 import { AppLoading } from "expo";
 import * as ImagePicker from "expo-image-picker";
 import * as Permissions from "expo-permissions";
-import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
-import RegForm from "./app/components/RegForm";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  TouchableOpacity,
+  Dimensions,
+} from "react-native";
+
+let screenWidth = Dimensions.get("window").width;
+let screenHight = Dimensions.get("window").height;
 
 export default function App() {
   //Load custom font
@@ -72,7 +82,7 @@ const styles = StyleSheet.create({
   },
   header: {
     fontSize: 45,
-    marginTop: 41,
+    marginTop: screenHight * 0.08,
     color: "white",
     fontFamily: "spyagencygrad",
   },
@@ -83,6 +93,6 @@ const styles = StyleSheet.create({
     borderRadius: 139 / 2,
     alignSelf: "center",
     resizeMode: "contain",
-    marginTop: 50,
+    marginTop: screenHight * 0.06,
   },
 });
