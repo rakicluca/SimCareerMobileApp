@@ -4,11 +4,11 @@
     "slug": "SimCareerApp",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/img/bdLogo.png",
     "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "image": "./assets/img/bdLogo.png",
+      "background": "#fffff",
+      "resizeMode": "contain"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
