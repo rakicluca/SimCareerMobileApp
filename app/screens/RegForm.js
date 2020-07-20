@@ -345,7 +345,7 @@ export default function RegForm() {
                           setValue("checkboxTds", !toggleCheckBox);
                         }}
                       />
-                      <Text style={{ marginTop: 5 }}>
+                      <Text style={{ marginTop: 6, color: "white" }}>
                         Ho letto ed accetto i TdS
                       </Text>
                     </View>

@@ -24,37 +24,35 @@ let screenHight = Dimensions.get("window").height;
 
 export default function LoginForm({ navigation }) {
   //Form Settings
-  const { control, errors, handleSubmit, getValues, setValue } = useForm();
+  const { control, errors, handleSubmit, getValues, setValue, reset } = useForm();
   const [loginSuccess, setLoginSuccess] = React.useState(false);
   const [rememberMeCheck, setRememberMeCheck] = React.useState(false);
-  const [auth, setAuth] = React.useState({
-    username: "",
-    password: "",
-  });
   React.useEffect(() => {
     async function rememberMeOnLoad() {
       const login = await getRememberedUser();
       console.log(login);
-      if (login) {
-        setAuth({ username: login.username, password: login.password });
+      if (login != undefined) {
+        reset({ username: login.username, password: login.password });
         setToggleCheckBox(true);
       }
+      console.log(
+        "user: " + watch("username") + "password: " + getValues("password")
+      );
     }
     rememberMeOnLoad();
   }, []);
 
   const onSubmit = (data) => {
     if (toggleCheckBox) {
-      console.log("dentro onsubmit togglecheckbox");
       setRememberMe(getValues("username"), getValues("password"));
     } else {
       removeRememberMe();
     }
     fetch(
       "http://192.168.1.7:3000/utenti/" +
-        getValues("username") +
-        "/" +
-        getValues("password"),
+      getValues("username") +
+      "/" +
+      getValues("password"),
       {
         method: "GET",
         dataType: "json",
@@ -116,7 +114,7 @@ export default function LoginForm({ navigation }) {
               )}
               name="username"
               rules={{ required: true }}
-              defaultValue={auth.username}
+              defaultValue=""
             />
             {errors.username && (
               <Text style={styles.errorText}>Campo richiesto</Text>
@@ -142,7 +140,7 @@ export default function LoginForm({ navigation }) {
                   message: "Troppo corta! Almeno 8 caratteri",
                 },
               }}
-              defaultValue={auth.password}
+              defaultValue=""
             />
             {errors.password && (
               <Text style={styles.errorText}>{errors.password.message}</Text>
@@ -175,7 +173,7 @@ export default function LoginForm({ navigation }) {
                 </View>
               )}
               name="checkboxTds"
-              defaultValue=""
+              defaultValue={"11111"}
             />
             {errors.checkboxTds && (
               <Text style={styles.errorText}>Campo richiesto</Text>
@@ -292,7 +290,7 @@ async function removeRememberMe() {
   try {
     await AsyncStorage.removeItem("username");
     await AsyncStorage.removeItem("password");
-  } catch (error) {}
+  } catch (error) { }
 }
 
 async function getRememberedUser() {
