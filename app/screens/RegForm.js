@@ -111,8 +111,8 @@ export default function RegForm() {
   };
   //CheckBox
   const [toggleCheckBox, setToggleCheckBox] = React.useState(false);
-  const format = require("date-fns/format");
   //Handle Confirm for DatePicker
+  const format = require("date-fns/format");
   let handleConfirm = (date) => {
     setDatePickerState({
       dateDisplay: format(date, "dd/MM/yyyy"),

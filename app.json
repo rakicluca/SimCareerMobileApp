@@ -4,11 +4,17 @@
     "slug": "SimCareerApp",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/img/bdLogo.png",
-    "splash": {
-      "image": "./assets/img/bdLogo.png",
-      "background": "#fffff",
-      "resizeMode": "contain"
+    "icon": "./assets/icon.png",
+    "android": {
+      "splash": {
+        "mdpi": "./assets/img/splash/drawable-mdpi/splash_mdpi.png",
+        "ldpi": "./assets/img/splash/drawable-ldpi/splash_ldpi.png",
+        "hdpi": "./assets/img/splash/drawable-hdpi/splash_hdpi.png",
+        "xhdpi": "./assets/img/splash/drawable-xhdpi/splash_xhdpi.png",
+        "xxhdpi": "./assets/img/splash/drawable-xxhdpi/splash_xxhdpi.png",
+        "xxxhdpi": "./assets/img/splash/drawable-xxxhdpi/splash_xxxhdpi.png",
+        "resizeMode": "cover"
+      }
     },
     "updates": {
       "fallbackToCacheTimeout": 0

@@ -17,6 +17,7 @@ import {
   Keyboard,
 } from "react-native";
 import { Button } from "react-native-elements";
+import AsyncStorage from "@react-native-community/async-storage";
 
 let screenWidth = Dimensions.get("window").width;
 let screenHight = Dimensions.get("window").height;
@@ -25,9 +26,32 @@ export default function LoginForm({ navigation }) {
   //Form Settings
   const { control, errors, handleSubmit, getValues, setValue } = useForm();
   const [loginSuccess, setLoginSuccess] = React.useState(false);
+  const [rememberMeCheck, setRememberMeCheck] = React.useState(false);
+  const [auth, setAuth] = React.useState({
+    username: "",
+    password: "",
+  });
+  React.useEffect(() => {
+    async function rememberMeOnLoad() {
+      const login = await getRememberedUser();
+      console.log(login);
+      if (login) {
+        setAuth({ username: login.username, password: login.password });
+        setToggleCheckBox(true);
+      }
+    }
+    rememberMeOnLoad();
+  }, []);
+
   const onSubmit = (data) => {
+    if (toggleCheckBox) {
+      console.log("dentro onsubmit togglecheckbox");
+      setRememberMe(getValues("username"), getValues("password"));
+    } else {
+      removeRememberMe();
+    }
     fetch(
-      "http://192.168.1.12:3000/utenti/" +
+      "http://192.168.1.7:3000/utenti/" +
         getValues("username") +
         "/" +
         getValues("password"),
@@ -92,7 +116,7 @@ export default function LoginForm({ navigation }) {
               )}
               name="username"
               rules={{ required: true }}
-              defaultValue=""
+              defaultValue={auth.username}
             />
             {errors.username && (
               <Text style={styles.errorText}>Campo richiesto</Text>
@@ -118,7 +142,7 @@ export default function LoginForm({ navigation }) {
                   message: "Troppo corta! Almeno 8 caratteri",
                 },
               }}
-              defaultValue=""
+              defaultValue={auth.password}
             />
             {errors.password && (
               <Text style={styles.errorText}>{errors.password.message}</Text>
@@ -167,7 +191,9 @@ export default function LoginForm({ navigation }) {
             <TouchableOpacity
               onPress={() => navigation.push("RegistrationForm")}
             >
-              <Text style={styles.registratiText}>Registrati</Text>
+              <Text style={styles.registratiText}>
+                Non ti sei ancora registrato? Registrati!
+              </Text>
             </TouchableOpacity>
             <Text style={styles.passwordDimenticataText}>
               Passowrd dimenticata?
@@ -237,8 +263,9 @@ const styles = StyleSheet.create({
     fontFamily: "spyagencynorm",
     marginTop: screenHight * 0.05,
     color: "rgba(5, 102, 255, 1)",
-    fontSize: 16,
+    fontSize: 11,
     textDecorationLine: "underline",
+    alignSelf: "center",
   },
   passwordDimenticataText: {
     fontFamily: "spyagencynorm",
@@ -251,3 +278,32 @@ const styles = StyleSheet.create({
     color: "red",
   },
 });
+
+async function setRememberMe(username, password) {
+  try {
+    await AsyncStorage.setItem("username", username);
+    await AsyncStorage.setItem("password", password);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+async function removeRememberMe() {
+  try {
+    await AsyncStorage.removeItem("username");
+    await AsyncStorage.removeItem("password");
+  } catch (error) {}
+}
+
+async function getRememberedUser() {
+  try {
+    const username = await AsyncStorage.getItem("username");
+    const password = await AsyncStorage.getItem("password");
+    if (username !== null) {
+      // We have user!!
+      return { username: username, password: password };
+    }
+  } catch (error) {
+    // Error retrieving data
+  }
+}
