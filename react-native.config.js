@@ -1,3 +1,6 @@
 module.exports = {
-  assets: ["./assets/fonts/SpyAgency"],
+  project: {
+    android: {}
+  },
+  assets: ['./assets/fonts/'],
 };

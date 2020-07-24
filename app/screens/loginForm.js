@@ -24,7 +24,14 @@ let screenHight = Dimensions.get("window").height;
 
 export default function LoginForm({ navigation }) {
   //Form Settings
-  const { control, errors, handleSubmit, getValues, setValue, reset } = useForm();
+  const {
+    control,
+    errors,
+    handleSubmit,
+    getValues,
+    setValue,
+    reset,
+  } = useForm();
   const [loginSuccess, setLoginSuccess] = React.useState(false);
   const [rememberMeCheck, setRememberMeCheck] = React.useState(false);
   React.useEffect(() => {
@@ -35,14 +42,12 @@ export default function LoginForm({ navigation }) {
         reset({ username: login.username, password: login.password });
         setToggleCheckBox(true);
       }
-      console.log(
-        "user: " + watch("username") + "password: " + getValues("password")
-      );
     }
     rememberMeOnLoad();
   }, []);
 
   const onSubmit = (data) => {
+    global.username = getValues("username");
     if (toggleCheckBox) {
       setRememberMe(getValues("username"), getValues("password"));
     } else {
@@ -50,9 +55,9 @@ export default function LoginForm({ navigation }) {
     }
     fetch(
       "http://192.168.1.7:3000/utenti/" +
-      getValues("username") +
-      "/" +
-      getValues("password"),
+        getValues("username") +
+        "/" +
+        getValues("password"),
       {
         method: "GET",
         dataType: "json",
@@ -290,7 +295,7 @@ async function removeRememberMe() {
   try {
     await AsyncStorage.removeItem("username");
     await AsyncStorage.removeItem("password");
-  } catch (error) { }
+  } catch (error) {}
 }
 
 async function getRememberedUser() {
