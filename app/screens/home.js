@@ -54,7 +54,7 @@ const getAllcampionati = ({ navigation }) => {
   const [isSelected, setIsSelected] = React.useState([]);
   React.useEffect(() => {
     function rememberMeOnLoad() {
-      fetch("http://192.168.1.7:3000/campionati/", {
+      fetch("http://192.168.1.18:3000/campionati/", {
         method: "GET",
         dataType: "json",
         headers: {
@@ -88,17 +88,28 @@ const getAllcampionati = ({ navigation }) => {
           //Solid=false stellina vuota
           solid={isSelected.includes(item.id) ? true : false}
           onPress={() => {
-            listaPreferiti.push(item.id);
-            let index = isSelected.indexOf(item.id);
+            //listaPreferiti.push(item.id);
+            /*React.useEffect(() => {
+              let index = isSelected.indexOf(item.id);
             if (!isSelected.includes(item.id)) {
               console.log("includes onPress");
-              let newData = [...isSelected, item.id];
-              setIsSelected(newData);
+              setIsSelected(previsSelected => ([...previsSelected, ...isSelected]));
               console.log("Id added: " + isSelected);
             } else setIsSelected(isSelected.splice(index, 1));
             console.log(isSelected);
             console.log(isSelected.includes(item.id));
             console.log("Item id: " + item.id);
+          }, [isSelected]);*/
+          console.log("Item id:"+item.id);
+          if(isSelected.includes(item.id)){
+            console.log("esiste già");
+            isSelected.splice(isSelected.indexOf(item.id),1);
+            setIsSelected([...isSelected,isSelected]);
+            console.log("Array splice: "+isSelected);
+          }else
+          setIsSelected([...isSelected,item.id]);
+          //setIsSelected(previsSelected => ([...previsSelected, ...isSelected]));
+          console.log(isSelected);
           }}
         ></Icon>
       }
@@ -120,10 +131,11 @@ const getAllcampionati = ({ navigation }) => {
     console.log(tmp);
     setIsSelected(tmp);
   }; */
+
   const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
     try {
-      let response = await fetch("http://192.168.1.7:3000/campionati/");
+      let response = await fetch("http://192.168.1.18:3000/campionati/");
       let responseJSON = await response.json();
       console.log(responseJSON);
       setListaCampionati(responseJSON);
@@ -153,7 +165,7 @@ const getPreferiti = ({ navigation }) => {
     //Get Preferiti
     try {
       let response = await fetch(
-        "http://192.168.1.7:3000/campionati/preferiti/" + global.username,
+        "http://192.168.1.18:3000/campionati/preferiti/" + global.username,
         {
           method: "PUT",
           dataType: "json",
@@ -198,7 +210,7 @@ const getPreferiti = ({ navigation }) => {
 
 const addPreferiti = () => {
   try {
-    fetch("http://192.168.1.7:3000/campionati/preferiti/" + global.username, {
+    fetch("http://192.168.1.18:3000/campionati/preferiti/" + global.username, {
       method: "POST",
       dataType: "json",
       headers: {

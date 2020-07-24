@@ -54,7 +54,7 @@ export default function LoginForm({ navigation }) {
       removeRememberMe();
     }
     fetch(
-      "http://192.168.1.7:3000/utenti/" +
+      "http://192.168.1.18:3000/utenti/" +
         getValues("username") +
         "/" +
         getValues("password"),
