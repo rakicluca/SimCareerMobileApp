@@ -12,8 +12,6 @@ import Profilo from "../screens/profilo";
 import { Text, Dimensions } from "react-native";
 import { color } from "react-native-reanimated";
 
-const RegistrationStack = createStackNavigator();
-
 const LoginStack = createStackNavigator();
 const LoginStackScreen = () => (
   <LoginStack.Navigator headerMode={"none"}>
@@ -38,7 +36,7 @@ const AppTabsScreen = () => (
         height: 5,
         width: 40,
       },
-      style: { backgroundColor: "rgba(51, 102, 255, 0.9)" },
+      style: { backgroundColor: "rgba(51, 102, 255, 1)" },
       labelStyle: {
         fontSize: 10,
       },

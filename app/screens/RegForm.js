@@ -25,6 +25,7 @@ import {
   Keyboard,
 } from "react-native";
 import { Component } from "react";
+import config from "../config/config";
 import Dots from "react-native-dots-pagination";
 
 let screenWidth = Dimensions.get("window").width;
@@ -76,7 +77,7 @@ export default function RegForm() {
   //OnSubmit Form
   const onSubmit = (data) => {
     try {
-      fetch("http://192.168.1.10:3000/utenti/", {
+      fetch(config.url.path + "/utenti/", {
         method: "POST",
         dataType: "json",
         headers: {

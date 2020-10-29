@@ -1,6 +1,8 @@
 import React from "react";
 import { useForm, Controller } from "react-hook-form";
 import { CommonActions } from "@react-navigation/native";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import {
@@ -21,10 +23,19 @@ import { Button } from "react-native-elements";
 import { render } from "react-dom";
 import { ListItem } from "react-native-elements";
 import AsyncStorage from "@react-native-community/async-storage";
-import { it } from "date-fns/locale";
-
+import { it, is } from "date-fns/locale";
+import config from "../config/config";
+import Campionati from "./campionati.js";
 let listaPreferiti = new Array();
-let respPref = new Array();
+
+const ChampionStack = createStackNavigator();
+const ChampionStackScreen = () => (
+  <ChampionStack.Navigator headerMode={"none"}>
+    <ChampionStack.Screen name="Home" component={HomeTabNavScreen} />
+    <ChampionStack.Screen name="Campionati" component={Campionati} />
+    {/* <ChampionStack.Screen name="Gare" component={Gare} /> */}
+  </ChampionStack.Navigator>
+);
 
 const HomeTabNav = createMaterialTopTabNavigator();
 const HomeTabNavScreen = () => (
@@ -33,7 +44,14 @@ const HomeTabNavScreen = () => (
     tabBarPosition="top"
     initialRouteName="Campionati"
     initialLayout={{ width: Dimensions.get("window").width }}
-    tabBarOptions={{ showIcon: true, showLabel: "true" }}
+    tabBarOptions={{
+      showIcon: true,
+      showLabel: "true",
+      style: { paddingTop: 30, backgroundColor: "rgba(51, 102, 255, 1)" },
+      inactiveTintColor: "rgba(255, 255, 255, 0.5)",
+      activeTintColor: "white",
+      indicatorStyle: { backgroundColor: "white" },
+    }}
   >
     <HomeTabNav.Screen
       onswipe
@@ -49,12 +67,38 @@ const HomeTabNavScreen = () => (
 
 const getAllcampionati = ({ navigation }) => {
   const [listaCampionati, setListaCampionati] = React.useState([]);
+  const [prefInDB, setprefInDB] = React.useState([]);
   const [refreshing, setRefreshing] = React.useState(false);
   const [isSolid, setisSolid] = React.useState(false);
   const [isSelected, setIsSelected] = React.useState([]);
+  const [removePref, setRemovePref] = React.useState([]);
   React.useEffect(() => {
+    //Get Preferiti
+    fetch(config.url.path + "/campionati/preferiti/" + global.username, {
+      method: "PUT",
+      dataType: "json",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => {
+        if (response.status === 200) {
+          return response.json();
+        } else {
+        }
+      })
+      .then((response) => {
+        let tmp = [];
+        response.forEach((element) => {
+          tmp.push(element.id);
+          listaPreferiti.push(element.id);
+        });
+        setIsSelected(...isSelected, tmp);
+      });
+
     function rememberMeOnLoad() {
-      fetch("http://192.168.1.18:3000/campionati/", {
+      fetch(config.url.path + "/campionati/", {
         method: "GET",
         dataType: "json",
         headers: {
@@ -74,70 +118,63 @@ const getAllcampionati = ({ navigation }) => {
     }
     rememberMeOnLoad();
   }, []);
+
   let keyItemLista = (item, index) => index.toString();
   let itemRender = ({ item }) => (
     <ListItem
       title={item.nome}
-      //onPress={}
+      onPress={() => navigation.push("Campionati", { campionato: item })}
+      bottomDivider
+      containerStyle={{ backgroundColor: "rgba(51, 102, 255)" }}
+      titleStyle={{ color: "white" }}
+      leftAvatar={{
+        source: { uri: item.logo },
+      }}
       rightIcon={
         <Icon
           size={30}
           name="star"
-          color={"black"}
+          color={"white"}
           //Solid=true stellina piena
           //Solid=false stellina vuota
           solid={isSelected.includes(item.id) ? true : false}
           onPress={() => {
-            //listaPreferiti.push(item.id);
-            /*React.useEffect(() => {
-              let index = isSelected.indexOf(item.id);
-            if (!isSelected.includes(item.id)) {
-              console.log("includes onPress");
-              setIsSelected(previsSelected => ([...previsSelected, ...isSelected]));
-              console.log("Id added: " + isSelected);
-            } else setIsSelected(isSelected.splice(index, 1));
-            console.log(isSelected);
-            console.log(isSelected.includes(item.id));
-            console.log("Item id: " + item.id);
-          }, [isSelected]);*/
-          console.log("Item id:"+item.id);
-          if(isSelected.includes(item.id)){
-            console.log("esiste già");
-            isSelected.splice(isSelected.indexOf(item.id),1);
-            setIsSelected([...isSelected,isSelected]);
-            console.log("Array splice: "+isSelected);
-          }else
-          setIsSelected([...isSelected,item.id]);
-          //setIsSelected(previsSelected => ([...previsSelected, ...isSelected]));
-          console.log(isSelected);
+            if (!listaPreferiti.includes(item.id)) listaPreferiti.push(item.id);
+            else listaPreferiti.splice(listaPreferiti.indexOf(item.id), 1);
+            console.log(listaPreferiti);
+            if (isSelected.includes(item.id)) {
+              isSelected.splice(isSelected.indexOf(item.id), 1);
+              setIsSelected([...isSelected, isSelected]);
+            } else setIsSelected([...isSelected, item.id]);
           }}
         ></Icon>
       }
+      style={{ backgroundColor: "rgba(51, 102, 255, 0.6)" }}
     />
   );
-  /*  const checkIsSelected = (item) => {
-    console.log("dentro check ");
-     let tmp = isSelecetd;
-    let selected = false;
-    if (tmp.includes(item.id)) selected = true;
-    return selected; 
-  };
-  const addToIsSelected = (item) => {
-    console.log("dentro");
-    let tmp = isSelecetd;
-    let index = tmp.indexOf(item.id);
-    if (!tmp.includes(item.id)) tmp.push(item.id);
-    else tmp.splice(index, 1);
-    console.log(tmp);
-    setIsSelected(tmp);
-  }; */
-
   const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
+    //Get Preferiti
+    fetch(config.url.path + "/campionati/preferiti/" + global.username, {
+      method: "PUT",
+      dataType: "json",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => {
+        if (response.status === 200) {
+          return response.json();
+        } else {
+        }
+      })
+      .then((response) => {
+        setprefInDB(response);
+      });
     try {
-      let response = await fetch("http://192.168.1.18:3000/campionati/");
+      let response = await fetch(config.url.path + "/campionati/");
       let responseJSON = await response.json();
-      console.log(responseJSON);
       setListaCampionati(responseJSON);
       setRefreshing(false);
     } catch (error) {
@@ -149,6 +186,9 @@ const getAllcampionati = ({ navigation }) => {
       renderItem={itemRender}
       data={listaCampionati}
       keyExtractor={keyItemLista}
+      style={{
+        backgroundColor: "rgba(51, 102, 255, 0.6)",
+      }}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
@@ -158,6 +198,7 @@ const getAllcampionati = ({ navigation }) => {
 
 const getPreferiti = ({ navigation }) => {
   const [refreshing, setRefreshing] = React.useState(false);
+  const [respPref, setrespPref] = React.useState([]);
   const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
     //Add Preferiti
@@ -165,7 +206,7 @@ const getPreferiti = ({ navigation }) => {
     //Get Preferiti
     try {
       let response = await fetch(
-        "http://192.168.1.18:3000/campionati/preferiti/" + global.username,
+        config.url.path + "/campionati/preferiti/" + global.username,
         {
           method: "PUT",
           dataType: "json",
@@ -179,19 +220,26 @@ const getPreferiti = ({ navigation }) => {
           if (response.status === 200) {
             return response.json();
           } else {
+            console.error("status not 200");
           }
         })
         .then((response) => {
-          respPref = response;
+          setrespPref(response);
         });
       setRefreshing(false);
     } catch (error) {
       console.error(error);
     }
   }, [refreshing]);
-  let itemRender = ({ item }) => (
+  let itemRender = ({ item, index }) => (
     <ListItem
-      title={item}
+      title={item.nome}
+      bottomDivider
+      containerStyle={{
+        backgroundColor: "rgba(51, 102, 255, 0.6)",
+        height: 72.5,
+      }}
+      titleStyle={{ color: "white" }}
       //onPress={}
     />
   );
@@ -200,7 +248,11 @@ const getPreferiti = ({ navigation }) => {
     <FlatList
       renderItem={itemRender}
       data={respPref}
+      extraData={respPref}
       keyExtractor={keyItemLista}
+      style={{
+        backgroundColor: "rgba(51, 102, 255, 0.6)",
+      }}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
@@ -210,7 +262,7 @@ const getPreferiti = ({ navigation }) => {
 
 const addPreferiti = () => {
   try {
-    fetch("http://192.168.1.18:3000/campionati/preferiti/" + global.username, {
+    fetch(config.url.path + "/campionati/preferiti/" + global.username, {
       method: "POST",
       dataType: "json",
       headers: {
@@ -235,6 +287,6 @@ const addPreferiti = () => {
   }
 };
 
-export default function Home() {
-  return <HomeTabNavScreen />;
+export default function Home({ navigation }) {
+  return <ChampionStackScreen />;
 }
