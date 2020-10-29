@@ -18,6 +18,7 @@ import {
 } from "react-native";
 import { Button } from "react-native-elements";
 import AsyncStorage from "@react-native-community/async-storage";
+import config from "../config/config";
 
 let screenWidth = Dimensions.get("window").width;
 let screenHight = Dimensions.get("window").height;
@@ -54,7 +55,8 @@ export default function LoginForm({ navigation }) {
       removeRememberMe();
     }
     fetch(
-      "http://192.168.1.18:3000/utenti/" +
+      config.url.path +
+        "/utenti/" +
         getValues("username") +
         "/" +
         getValues("password"),
