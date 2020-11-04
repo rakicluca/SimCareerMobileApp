@@ -26,6 +26,7 @@ import AsyncStorage from "@react-native-community/async-storage";
 import { it, is } from "date-fns/locale";
 import config from "../config/config";
 import Campionati from "./campionati.js";
+import syncStorage from "sync-storage";
 let listaPreferiti = new Array();
 
 const ChampionStack = createStackNavigator();
@@ -90,10 +91,11 @@ const getAllcampionati = ({ navigation }) => {
       })
       .then((response) => {
         let tmp = [];
-        response.forEach((element) => {
-          tmp.push(element.id);
-          listaPreferiti.push(element.id);
-        });
+        if (response != null)
+          response.forEach((element) => {
+            tmp.push(element.id);
+            listaPreferiti.push(element.id);
+          });
         setIsSelected(...isSelected, tmp);
       });
 
@@ -123,7 +125,10 @@ const getAllcampionati = ({ navigation }) => {
   let itemRender = ({ item }) => (
     <ListItem
       title={item.nome}
-      onPress={() => navigation.push("Campionati", { campionato: item })}
+      onPress={() => {
+        syncStorage.set("listagare", JSON.stringify(item.calendario));
+        navigation.push("Campionati", { campionato: item });
+      }}
       bottomDivider
       containerStyle={{ backgroundColor: "rgba(51, 102, 255)" }}
       titleStyle={{ color: "white" }}
@@ -240,7 +245,9 @@ const getPreferiti = ({ navigation }) => {
         height: 72.5,
       }}
       titleStyle={{ color: "white" }}
-      //onPress={}
+      onPress={() => {
+        navigation.push("Campionati", { campionato: item });
+      }}
     />
   );
   let keyItemLista = (item, index) => index.toString();
