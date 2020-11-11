@@ -11,18 +11,20 @@ import {
   Platform,
   Keyboard,
   FlatList,
+  TouchableHighlight,
 } from "react-native";
 import { Button, ListItem, Avatar } from "react-native-elements";
+import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 import config from "../config/config";
 let width = Dimensions.get("screen").width;
 
-function getGare(listaGare) {
+function getGare(navigation, listaGare) {
   let [listCircuiti, setListCircuiti] = useState([]);
   React.useEffect(() => {
     let idList = [];
     listaGare.forEach((element) => {
       idList.push(element.idCircuito);
-    });
+    }, []);
     //CHIAMATA DB
     async function getData() {
       await fetch(config.url.path + "/circuiti/getCircuiti", {
@@ -48,6 +50,8 @@ function getGare(listaGare) {
   }, []);
   let itemRender = ({ item, index }) => (
     <ListItem
+      onPress={() => navigation.push("Gara")}
+      Component={TouchableOpacity}
       bottomDivider
       containerStyle={{ backgroundColor: "rgba(51, 102, 255)" }}
     >
@@ -68,13 +72,15 @@ function getGare(listaGare) {
         >
           {item.nome}
         </ListItem.Title>
-        <ListItem.Title style={{ alignSelf: "center", color: "white" }}>
-          {listaGare[index].data}
-        </ListItem.Title>
         <ListItem.Subtitle style={{ alignSelf: "center", color: "white" }}>
           {item.meteo}
         </ListItem.Subtitle>
       </ListItem.Content>
+      <ListItem.Title
+        style={{ alignSelf: "center", color: "white", fontSize: 14 }}
+      >
+        {listaGare[index].data}
+      </ListItem.Title>
     </ListItem>
   );
   return (
@@ -86,33 +92,16 @@ function getGare(listaGare) {
   );
 }
 
-export default function Gare({ route }) {
+export default function Gare({ navigation, route }) {
   return (
     <View
       style={{
         flex: 1,
-
         backgroundColor: "rgba(51, 102, 255, 0.6)",
       }}
     >
-      {getGare(route.params.listaGare)}
-      <View style={{ marginVertical: "4%" }}>
-        <Button
-          buttonStyle={styles.buttonIscriviti}
-          titleStyle={styles.buttonIscrivitiText}
-          title="ISCRIVITI"
-        ></Button>
-      </View>
+      {getGare(navigation, route.params.listaGare)}
     </View>
   );
 }
-const styles = StyleSheet.create({
-  buttonIscriviti: {
-    width: width / 3,
-    backgroundColor: "white",
-    alignSelf: "center",
-  },
-  buttonIscrivitiText: {
-    color: "black",
-  },
-});
+const styles = StyleSheet.create({});

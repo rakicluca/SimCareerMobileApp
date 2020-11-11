@@ -14,30 +14,111 @@ import {
   Platform,
   Keyboard,
 } from "react-native";
-import { Button } from "react-native-elements";
+import { Button, Icon } from "react-native-elements";
 import { createStackNavigator } from "@react-navigation/stack";
 import Info from "./info";
 import ClassificaCampionati from "./classifiche_Campionati";
 import Gare from "./gare";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import AsyncStorage from "@react-native-community/async-storage";
 import SyncStorage from "sync-storage";
+import config from "../config/config";
+import Modal from "react-native-modal";
+import DropDownPicker from "react-native-dropdown-picker";
 
 let width = Dimensions.get("screen").width;
 let heigth = Dimensions.get("screen").height;
-console.log("W: " + width + "H: " + heigth);
 
-function getData() {
-  /* let data = [];
-  try {
-    data = await AsyncStorage.getItem("listagare");
-    console.log(data);
-  } catch (error) {}
-  return data; */
-
-  let data = SyncStorage.get("listagare");
-  console.log(data);
+function getData(dataName) {
+  let data = SyncStorage.get(dataName);
   return JSON.parse(data);
+}
+
+async function sub_ToChamp(idCampionato, pickedTeam, pickedVettura) {
+  let idutente = SyncStorage.get("utente").id;
+
+  await fetch(config.url.path + "/campionati/iscriviToChamp/" + idCampionato, {
+    method: "POST",
+    dataType: "json",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      idUtente: idutente,
+      auto: pickedVettura,
+      team: pickedTeam,
+    }),
+  }).then((response) => {
+    if (response.status === 200) {
+      return response.json();
+    } else {
+      console.log("status not 200");
+    }
+  });
+}
+
+async function removeUtenteFromChamp(idCampionato) {
+  let idutente = SyncStorage.get("utente").id;
+  try {
+    await fetch(
+      config.url.path +
+        "/campionati/removeFromChamp/" +
+        idCampionato +
+        "/" +
+        idutente,
+      {
+        method: "DELETE",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      }
+    ).then((response) => {
+      if (response.status === 200) {
+        return response.json();
+      } else {
+        console.log("status not 200");
+      }
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+function getListaVetture(listaVetture) {
+  let array = [];
+
+  listaVetture.forEach((element, index) => {
+    array.push({ label: element, value: index });
+  });
+  return array;
+}
+
+async function getListaTeam() {
+  let data = await fetch(config.url.path + "/team");
+  let listaTeam = await data.json();
+
+  return listaTeam;
+}
+
+function createArrayTeam(listaTeam) {
+  let array = [];
+  listaTeam.forEach((element, index) => {
+    array.push({ label: element.nome, value: index });
+  });
+  return array;
+}
+
+async function checkIsSub(idCampionato) {
+  return await fetch(
+    config.url.path +
+      "/campionati/checkSub/" +
+      idCampionato +
+      "/" +
+      SyncStorage.get("utente").id
+  ).then((res) => {
+    return res.json();
+  });
 }
 
 const ChampionStack = createStackNavigator();
@@ -57,29 +138,51 @@ const HomeTabNavScreen = () => (
     initialRouteName="Gare"
     initialLayout={{ width: Dimensions.get("window").width }}
     tabBarOptions={{
-      showIcon: true,
-      showLabel: "true",
+      showLabel: true,
       style: { paddingTop: 5, backgroundColor: "rgba(51, 102, 255, 1)" },
       inactiveTintColor: "rgba(255, 255, 255, 0.5)",
       activeTintColor: "white",
       indicatorStyle: { backgroundColor: "white" },
     }}
+    backBehavior={"order"}
   >
     <HomeTabNav.Screen
       name="Gare"
       component={Gare}
-      initialParams={{ listaGare: getData() }}
+      initialParams={{ listaGare: getData("listagare") }}
     ></HomeTabNav.Screen>
     <HomeTabNav.Screen
       name="Classifiche"
       component={ClassificaCampionati}
+      initialParams={{ idCampionato: getData("idCampionato") }}
     ></HomeTabNav.Screen>
-    <HomeTabNav.Screen onswipe name="Info" component={Info}></HomeTabNav.Screen>
+    <HomeTabNav.Screen
+      onswipe
+      name="Info"
+      component={Info}
+      initialParams={{ campionato: getData("campionato") }}
+    ></HomeTabNav.Screen>
   </HomeTabNav.Navigator>
 );
 export default function Campionati({ route }) {
   let logoURL = route.params.campionato.logo;
   let gare = route.params.campionato.calendario;
+  let listaVettureChamp = getListaVetture(route.params.campionato.lista_auto);
+  const [listaTeam, setListaTeam] = useState([]);
+  const [isSub, setIsSub] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const [pickedVettura, setPickedVettura] = useState([]);
+  const [pickedTeam, setPickedTeam] = useState([]);
+  React.useEffect(() => {
+    getListaTeam().then((res) => {
+      let tmp = createArrayTeam(res);
+      setListaTeam(tmp);
+    });
+
+    checkIsSub(route.params.campionato.id).then((res) => {
+      if (res.status == "200") setIsSub(true);
+    });
+  }, []);
   //Load custom font
   const [isLoaded] = useFonts({
     spyagencygrad: require("../../assets/fonts/SpyAgency/spyagency3grad.ttf"),
@@ -90,6 +193,77 @@ export default function Campionati({ route }) {
   } else {
     return (
       <View style={{ flex: 1, backgroundColor: "rgba(51, 102, 255, 0.6)" }}>
+        {/* MODAL FOR SUBSCRIBE TO CHAMP */}
+        <Modal
+          isVisible={isVisible}
+          onBackdropPress={() => {
+            setIsVisible(false);
+          }}
+        >
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Seleziona</Text>
+            <View style={styles.modalContent}>
+              <View style={styles.modalBody}>
+                <Text style={styles.modalText}>Vettura</Text>
+                <DropDownPicker
+                  items={listaVettureChamp}
+                  itemStyle={{ justifyContent: "flex-start" }}
+                  placeholder="Seleziona una vettura"
+                  placeholderStyle={{ justifyContent: "flex-start" }}
+                  containerStyle={{
+                    height: 40,
+                    width: width / 2.5,
+                    marginLeft: 87,
+                  }}
+                  dropDownMaxHeight={90}
+                  onChangeItem={(item) => {
+                    setPickedVettura(item.label);
+                  }}
+                />
+              </View>
+              <View style={[styles.modalBody, { marginTop: "5%" }]}>
+                <Text style={styles.modalText}>Team</Text>
+                <DropDownPicker
+                  items={listaTeam}
+                  itemStyle={{ justifyContent: "flex-start" }}
+                  placeholder="Seleziona un team"
+                  placeholderStyle={{ justifyContent: "flex-start" }}
+                  containerStyle={{
+                    height: 40,
+                    width: width / 2.5,
+                    marginLeft: 100,
+                  }}
+                  dropDownMaxHeight={90}
+                  onChangeItem={(item) => {
+                    setPickedTeam(item.label);
+                  }}
+                />
+              </View>
+            </View>
+            <View style={styles.modalBottom}>
+              <Button
+                title="Invia"
+                buttonStyle={{
+                  width: width / 3,
+                }}
+                type="outline"
+                titleStyle={{ color: "#00BCD4", fontSize: 20 }}
+                onPress={() => {
+                  if (pickedTeam.length != 0 && pickedVettura.length != 0) {
+                    sub_ToChamp(
+                      route.params.campionato.id,
+                      pickedTeam,
+                      pickedVettura
+                    ).then(() => {
+                      setIsSub(true);
+                      setIsVisible(false);
+                    });
+                  }
+                }}
+              ></Button>
+            </View>
+          </View>
+        </Modal>
         <View
           style={{
             flexDirection: "row",
@@ -148,6 +322,21 @@ export default function Campionati({ route }) {
         >
           {/* TABELLA CON LE GARE */}
           <ChampionStackScreen></ChampionStackScreen>
+          <View style={{ marginVertical: "4%" }}>
+            <Button
+              buttonStyle={styles.buttonIscriviti}
+              titleStyle={styles.buttonIscrivitiText}
+              title={isSub ? "DISISCRIVITI" : "ISCRIVITI"}
+              onPress={() => {
+                if (!isSub) setIsVisible(true);
+                else {
+                  removeUtenteFromChamp(route.params.campionato.id).then(
+                    setIsSub(false)
+                  );
+                }
+              }}
+            ></Button>
+          </View>
         </View>
       </View>
     );
@@ -162,5 +351,39 @@ const styles = StyleSheet.create({
   infoCampionato: {
     fontSize: 15,
     marginVertical: "2%",
+  },
+  buttonIscriviti: {
+    width: width / 3,
+    backgroundColor: "white",
+    alignSelf: "center",
+  },
+  buttonIscrivitiText: {
+    color: "black",
+  },
+  modalContainer: {
+    backgroundColor: "white",
+    //height: heigth > 800 ? heigth / 3.5 : heigth / 3,
+    width: "100%",
+    padding: "5%",
+  },
+  modalContent: { marginTop: "5%" },
+  modalTitle: {
+    fontSize: 22,
+  },
+  modalBody: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  modalText: {
+    fontSize: 18,
+  },
+  modalBottom: {
+    alignItems: "center",
+    marginTop: heigth > 800 ? "10%" : "5%",
+  },
+  modalButton: {
+    fontSize: 25,
+    fontWeight: "bold",
+    color: "#00BCD4",
   },
 });

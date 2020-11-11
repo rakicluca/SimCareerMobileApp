@@ -19,6 +19,7 @@ import {
 import { Button } from "react-native-elements";
 import AsyncStorage from "@react-native-community/async-storage";
 import config from "../config/config";
+import syncStorage from "sync-storage";
 
 let screenWidth = Dimensions.get("window").width;
 let screenHight = Dimensions.get("window").height;
@@ -79,6 +80,7 @@ export default function LoginForm({ navigation }) {
       })
       .then((response) => {
         if (response) {
+          syncStorage.set("utente", response);
           navigation.dispatch(
             CommonActions.reset({
               index: 0,

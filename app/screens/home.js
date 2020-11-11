@@ -19,7 +19,7 @@ import {
   FlatList,
   RefreshControl,
 } from "react-native";
-import { Button } from "react-native-elements";
+import { Avatar, Button } from "react-native-elements";
 import { render } from "react-dom";
 import { ListItem } from "react-native-elements";
 import AsyncStorage from "@react-native-community/async-storage";
@@ -27,6 +27,7 @@ import { it, is } from "date-fns/locale";
 import config from "../config/config";
 import Campionati from "./campionati.js";
 import syncStorage from "sync-storage";
+import Gara from "./gara";
 let listaPreferiti = new Array();
 
 const ChampionStack = createStackNavigator();
@@ -35,6 +36,7 @@ const ChampionStackScreen = () => (
     <ChampionStack.Screen name="Home" component={HomeTabNavScreen} />
     <ChampionStack.Screen name="Campionati" component={Campionati} />
     {/* <ChampionStack.Screen name="Gare" component={Gare} /> */}
+    <ChampionStack.Screen name="Gara" component={Gara} />
   </ChampionStack.Navigator>
 );
 
@@ -124,38 +126,40 @@ const getAllcampionati = ({ navigation }) => {
   let keyItemLista = (item, index) => index.toString();
   let itemRender = ({ item }) => (
     <ListItem
-      title={item.nome}
+      Component={TouchableOpacity}
       onPress={() => {
         syncStorage.set("listagare", JSON.stringify(item.calendario));
+        syncStorage.set("idCampionato", JSON.stringify(item.id));
+        syncStorage.set("campionato", JSON.stringify(item));
         navigation.push("Campionati", { campionato: item });
       }}
       bottomDivider
       containerStyle={{ backgroundColor: "rgba(51, 102, 255)" }}
-      titleStyle={{ color: "white" }}
-      leftAvatar={{
-        source: { uri: item.logo },
-      }}
-      rightIcon={
-        <Icon
-          size={30}
-          name="star"
-          color={"white"}
-          //Solid=true stellina piena
-          //Solid=false stellina vuota
-          solid={isSelected.includes(item.id) ? true : false}
-          onPress={() => {
-            if (!listaPreferiti.includes(item.id)) listaPreferiti.push(item.id);
-            else listaPreferiti.splice(listaPreferiti.indexOf(item.id), 1);
-            console.log(listaPreferiti);
-            if (isSelected.includes(item.id)) {
-              isSelected.splice(isSelected.indexOf(item.id), 1);
-              setIsSelected([...isSelected, isSelected]);
-            } else setIsSelected([...isSelected, item.id]);
-          }}
-        ></Icon>
-      }
       style={{ backgroundColor: "rgba(51, 102, 255, 0.6)" }}
-    />
+    >
+      <Avatar rounded size={40} source={{ uri: item.logo }}></Avatar>
+      <ListItem.Content>
+        <ListItem.Title style={{ color: "white" }}>{item.nome}</ListItem.Title>
+      </ListItem.Content>
+      <Icon
+        size={25}
+        name="star"
+        color={"white"}
+        style={{ justifyContent: "flex-end" }}
+        //Solid=true stellina piena
+        //Solid=false stellina vuota
+        solid={isSelected.includes(item.id) ? true : false}
+        onPress={() => {
+          if (!listaPreferiti.includes(item.id)) listaPreferiti.push(item.id);
+          else listaPreferiti.splice(listaPreferiti.indexOf(item.id), 1);
+          console.log(listaPreferiti);
+          if (isSelected.includes(item.id)) {
+            isSelected.splice(isSelected.indexOf(item.id), 1);
+            setIsSelected([...isSelected, isSelected]);
+          } else setIsSelected([...isSelected, item.id]);
+        }}
+      ></Icon>
+    </ListItem>
   );
   const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
@@ -238,17 +242,19 @@ const getPreferiti = ({ navigation }) => {
   }, [refreshing]);
   let itemRender = ({ item, index }) => (
     <ListItem
-      title={item.nome}
       bottomDivider
+      Component={TouchableOpacity}
       containerStyle={{
         backgroundColor: "rgba(51, 102, 255, 0.6)",
         height: 72.5,
       }}
-      titleStyle={{ color: "white" }}
       onPress={() => {
         navigation.push("Campionati", { campionato: item });
       }}
-    />
+    >
+      <Avatar rounded size={40} source={{ uri: item.logo }}></Avatar>
+      <ListItem.Title style={{ color: "white" }}>{item.nome}</ListItem.Title>
+    </ListItem>
   );
   let keyItemLista = (item, index) => index.toString();
   return (

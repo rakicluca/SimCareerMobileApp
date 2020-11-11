@@ -130,25 +130,99 @@ export default function RegForm() {
   function cleanUpDatePickerState() {
     return setDatePickerState({ visibility: false, dateDisplay: "" });
   }
-  if (!isLoaded) {
+  /*   if (!isLoaded) {
     return <AppLoading />;
-  } else {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.header}>SIM CAREER</Text>
-        <TouchableOpacity onPress={openImagePickerAsync}>
-          <Image
-            source={{ uri: selectedImage }}
-            style={styles.ImgUtente}
-          ></Image>
-        </TouchableOpacity>
-        <View style={{ flex: 1 }}>
-          <ScrollView
-            horizontal={true}
-            pagingEnabled={true}
-            scrollEventThrottle={16}
-            showsHorizontalScrollIndicator={false}
-          >
+  } else { */
+  return (
+    <View style={styles.container}>
+      <Text style={styles.header}>SIM CAREER</Text>
+      <TouchableOpacity onPress={openImagePickerAsync}>
+        <Image source={{ uri: selectedImage }} style={styles.ImgUtente}></Image>
+      </TouchableOpacity>
+      <View style={{ flex: 1 }}>
+        <ScrollView
+          horizontal={true}
+          pagingEnabled={true}
+          scrollEventThrottle={16}
+          showsHorizontalScrollIndicator={false}
+        >
+          <View style={styles.regform}>
+            <Controller
+              control={control}
+              render={({ onChange, onBlur, value }) => (
+                <TextInput
+                  style={styles.textinput}
+                  onBlur={onBlur}
+                  onChangeText={(value) => onChange(value)}
+                  value={value}
+                  placeholder="Inserisci il tuo username"
+                  underlineColorAndroid={"transparent"}
+                />
+              )}
+              name="username"
+              rules={{ required: true }}
+              defaultValue=""
+            />
+            {errors.username && (
+              <Text style={styles.errorText}>Campo richiesto</Text>
+            )}
+            <Controller
+              control={control}
+              render={({ onChange, onBlur, value }) => (
+                <TextInput
+                  style={styles.textinput}
+                  onBlur={onBlur}
+                  onChangeText={(value) => onChange(value)}
+                  value={value}
+                  placeholder="Inserisci la tua email"
+                  underlineColorAndroid={"transparent"}
+                />
+              )}
+              name="email"
+              rules={{
+                required: { value: true, message: "Campo richiesto" },
+                pattern: {
+                  value: /(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+                  message: "Email non valida",
+                },
+              }}
+              defaultValue=""
+            />
+            {errors.email && (
+              <Text style={styles.errorText}>{errors.email.message}</Text>
+            )}
+            <Controller
+              control={control}
+              render={({ onChange, onBlur, value }) => (
+                <TextInput
+                  style={styles.textinput}
+                  onBlur={onBlur}
+                  onChangeText={(value) => onChange(value)}
+                  value={value}
+                  placeholder="Inserisci la tua password"
+                  underlineColorAndroid={"transparent"}
+                  secureTextEntry={true}
+                />
+              )}
+              name="password"
+              rules={{
+                required: { value: true, message: "Campo richiesto" },
+                minLength: {
+                  value: 8,
+                  message: "Troppo corta! Almeno 8 caratteri",
+                },
+              }}
+              defaultValue=""
+            />
+            {errors.password && (
+              <Text style={styles.errorText}>{errors.password.message}</Text>
+            )}
+            <View style={{ marginTop: screenHight * 0.23 }}>
+              <Dots length={2} active={0} />
+            </View>
+          </View>
+
+          <ScrollView showsVerticalScrollIndicator={false}>
             <View style={styles.regform}>
               <Controller
                 control={control}
@@ -158,226 +232,154 @@ export default function RegForm() {
                     onBlur={onBlur}
                     onChangeText={(value) => onChange(value)}
                     value={value}
-                    placeholder="Inserisci il tuo username"
+                    placeholder="Inserisci il tuo nome"
                     underlineColorAndroid={"transparent"}
                   />
                 )}
-                name="username"
+                name="nome"
+                rules={{
+                  required: { value: true, message: "Campo richiesto" },
+                  validate: (value) =>
+                    value.match(/[0-9!/"£$%&()=?^@#§*]/) == null ||
+                    "Numeri e caratteri speciali non ammessi",
+                }}
+                defaultValue=""
+              />
+              {errors.nome && (
+                <Text style={styles.errorText}>{errors.nome.message}</Text>
+              )}
+              <Controller
+                control={control}
+                render={({ onChange, onBlur, value }) => (
+                  <TextInput
+                    style={styles.textinput}
+                    onBlur={onBlur}
+                    onChangeText={(value) => onChange(value)}
+                    value={value}
+                    style={styles.textinput}
+                    placeholder="Inserisci il tuo cognome"
+                    underlineColorAndroid={"transparent"}
+                  />
+                )}
+                name="cognome"
+                rules={{
+                  required: { value: true, message: "Campo richiesto" },
+                  validate: (value) =>
+                    value.match(/[0-9!/"£$%&()=?^@#§*]/) == null ||
+                    "Numeri e caratteri speciali non ammessi",
+                }}
+                defaultValue=""
+              />
+              {errors.cognome && (
+                <Text style={styles.errorText}>{errors.cognome.message}</Text>
+              )}
+              <Controller
+                control={control}
+                render={({ onChange, onBlur, dateDisplay }) => (
+                  <TouchableOpacity onPress={() => onPresstextInput()}>
+                    <TextInput
+                      style={styles.textinput}
+                      placeholder="GG/MM/YYYY"
+                      underlineColorAndroid={"transparent"}
+                      editable={false}
+                      value={datePickerState.dateDisplay}
+                      onBlur={onBlur}
+                      onChangeText={(dateDisplay) => onChange(dateDisplay)}
+                    ></TextInput>
+                  </TouchableOpacity>
+                )}
+                name="data"
+                rules={{
+                  required: { value: true, message: "Campo richiesto" },
+                }}
+                defaultValue=""
+              />
+              {errors.data && (
+                <Text style={styles.errorText}>{errors.data.message}</Text>
+              )}
+              <DateTimePickerModal
+                isVisible={datePickerState.visibility}
+                onConfirm={handleConfirm}
+                onCancel={onPressCancel}
+                mode="date"
+                maximumDate={new Date()}
+                locale="it-IT"
+              ></DateTimePickerModal>
+              <Controller
+                control={control}
+                render={({ onChange, onBlur, dateDisplay }) => (
+                  <TextInput
+                    style={styles.textinput}
+                    underlineColorAndroid={"transparent"}
+                    onBlur={onBlur}
+                    placeholder="Inserisci la tua residenza"
+                    onChangeText={(dateDisplay) => onChange(dateDisplay)}
+                    underlineColorAndroid={"transparent"}
+                  ></TextInput>
+                )}
+                name="residenza"
+                rules={{
+                  required: { value: true, message: "Campo richiesto" },
+                }}
+                defaultValue=""
+              />
+              {errors.residenza && (
+                <Text style={styles.errorText}>{errors.residenza.message}</Text>
+              )}
+              <Controller
+                control={control}
+                render={({ onChange, onBlur, value }) => (
+                  <View style={{ flexDirection: "row" }}>
+                    <CheckBox
+                      value={toggleCheckBox}
+                      checked={toggleCheckBox}
+                      tintColors={{ true: "white" }}
+                      onValueChange={() => {
+                        toggleCheckBox
+                          ? setToggleCheckBox(false)
+                          : setToggleCheckBox(true);
+                        setValue("checkboxTds", !toggleCheckBox);
+                      }}
+                    />
+                    <Text style={{ marginTop: 6, color: "white" }}>
+                      Ho letto ed accetto i TdS
+                    </Text>
+                  </View>
+                )}
+                name="checkboxTds"
                 rules={{ required: true }}
                 defaultValue=""
               />
-              {errors.username && (
+              {errors.checkboxTds && (
                 <Text style={styles.errorText}>Campo richiesto</Text>
               )}
-              <Controller
-                control={control}
-                render={({ onChange, onBlur, value }) => (
-                  <TextInput
-                    style={styles.textinput}
-                    onBlur={onBlur}
-                    onChangeText={(value) => onChange(value)}
-                    value={value}
-                    placeholder="Inserisci la tua email"
-                    underlineColorAndroid={"transparent"}
-                  />
-                )}
-                name="email"
-                rules={{
-                  required: { value: true, message: "Campo richiesto" },
-                  pattern: {
-                    value: /(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-                    message: "Email non valida",
-                  },
-                }}
-                defaultValue=""
-              />
-              {errors.email && (
-                <Text style={styles.errorText}>{errors.email.message}</Text>
-              )}
-              <Controller
-                control={control}
-                render={({ onChange, onBlur, value }) => (
-                  <TextInput
-                    style={styles.textinput}
-                    onBlur={onBlur}
-                    onChangeText={(value) => onChange(value)}
-                    value={value}
-                    placeholder="Inserisci la tua password"
-                    underlineColorAndroid={"transparent"}
-                    secureTextEntry={true}
-                  />
-                )}
-                name="password"
-                rules={{
-                  required: { value: true, message: "Campo richiesto" },
-                  minLength: {
-                    value: 8,
-                    message: "Troppo corta! Almeno 8 caratteri",
-                  },
-                }}
-                defaultValue=""
-              />
-              {errors.password && (
-                <Text style={styles.errorText}>{errors.password.message}</Text>
-              )}
-              <View style={{ marginTop: screenHight * 0.23 }}>
-                <Dots length={2} active={0} />
+              <View style={styles.buttonRegistrati}>
+                <Button
+                  title={"Registrati"}
+                  titleStyle={{ fontFamily: "spyagencygrad", fontSize: 16 }}
+                  onPress={handleSubmit(onSubmit)}
+                />
+              </View>
+              <View style={styles.dotStyle}>
+                <Dots length={2} active={1} />
               </View>
             </View>
-
-            <ScrollView showsVerticalScrollIndicator={false}>
-              <View style={styles.regform}>
-                <Controller
-                  control={control}
-                  render={({ onChange, onBlur, value }) => (
-                    <TextInput
-                      style={styles.textinput}
-                      onBlur={onBlur}
-                      onChangeText={(value) => onChange(value)}
-                      value={value}
-                      placeholder="Inserisci il tuo nome"
-                      underlineColorAndroid={"transparent"}
-                    />
-                  )}
-                  name="nome"
-                  rules={{
-                    required: { value: true, message: "Campo richiesto" },
-                    validate: (value) =>
-                      value.match(/[0-9!/"£$%&()=?^@#§*]/) == null ||
-                      "Numeri e caratteri speciali non ammessi",
-                  }}
-                  defaultValue=""
-                />
-                {errors.nome && (
-                  <Text style={styles.errorText}>{errors.nome.message}</Text>
-                )}
-                <Controller
-                  control={control}
-                  render={({ onChange, onBlur, value }) => (
-                    <TextInput
-                      style={styles.textinput}
-                      onBlur={onBlur}
-                      onChangeText={(value) => onChange(value)}
-                      value={value}
-                      style={styles.textinput}
-                      placeholder="Inserisci il tuo cognome"
-                      underlineColorAndroid={"transparent"}
-                    />
-                  )}
-                  name="cognome"
-                  rules={{
-                    required: { value: true, message: "Campo richiesto" },
-                    validate: (value) =>
-                      value.match(/[0-9!/"£$%&()=?^@#§*]/) == null ||
-                      "Numeri e caratteri speciali non ammessi",
-                  }}
-                  defaultValue=""
-                />
-                {errors.cognome && (
-                  <Text style={styles.errorText}>{errors.cognome.message}</Text>
-                )}
-                <Controller
-                  control={control}
-                  render={({ onChange, onBlur, dateDisplay }) => (
-                    <TouchableOpacity onPress={() => onPresstextInput()}>
-                      <TextInput
-                        style={styles.textinput}
-                        placeholder="GG/MM/YYYY"
-                        underlineColorAndroid={"transparent"}
-                        editable={false}
-                        value={datePickerState.dateDisplay}
-                        onBlur={onBlur}
-                        onChangeText={(dateDisplay) => onChange(dateDisplay)}
-                      ></TextInput>
-                    </TouchableOpacity>
-                  )}
-                  name="data"
-                  rules={{
-                    required: { value: true, message: "Campo richiesto" },
-                  }}
-                  defaultValue=""
-                />
-                {errors.data && (
-                  <Text style={styles.errorText}>{errors.data.message}</Text>
-                )}
-                <DateTimePickerModal
-                  isVisible={datePickerState.visibility}
-                  onConfirm={handleConfirm}
-                  onCancel={onPressCancel}
-                  mode="date"
-                  maximumDate={new Date()}
-                  locale="it-IT"
-                ></DateTimePickerModal>
-                <Controller
-                  control={control}
-                  render={({ onChange, onBlur, dateDisplay }) => (
-                    <TextInput
-                      style={styles.textinput}
-                      underlineColorAndroid={"transparent"}
-                      onBlur={onBlur}
-                      placeholder="Inserisci la tua residenza"
-                      onChangeText={(dateDisplay) => onChange(dateDisplay)}
-                      underlineColorAndroid={"transparent"}
-                    ></TextInput>
-                  )}
-                  name="residenza"
-                  rules={{
-                    required: { value: true, message: "Campo richiesto" },
-                  }}
-                  defaultValue=""
-                />
-                {errors.residenza && (
-                  <Text style={styles.errorText}>
-                    {errors.residenza.message}
-                  </Text>
-                )}
-                <Controller
-                  control={control}
-                  render={({ onChange, onBlur, value }) => (
-                    <View style={{ flexDirection: "row" }}>
-                      <CheckBox
-                        value={toggleCheckBox}
-                        checked={toggleCheckBox}
-                        tintColors={{ true: "white" }}
-                        onValueChange={() => {
-                          toggleCheckBox
-                            ? setToggleCheckBox(false)
-                            : setToggleCheckBox(true);
-                          setValue("checkboxTds", !toggleCheckBox);
-                        }}
-                      />
-                      <Text style={{ marginTop: 6, color: "white" }}>
-                        Ho letto ed accetto i TdS
-                      </Text>
-                    </View>
-                  )}
-                  name="checkboxTds"
-                  rules={{ required: true }}
-                  defaultValue=""
-                />
-                {errors.checkboxTds && (
-                  <Text style={styles.errorText}>Campo richiesto</Text>
-                )}
-                <View style={styles.buttonRegistrati}>
-                  <Button
-                    title={"Registrati"}
-                    titleStyle={{ fontFamily: "spyagencygrad", fontSize: 17 }}
-                    onPress={handleSubmit(onSubmit)}
-                  />
-                </View>
-                <View style={styles.dotStyle}>
-                  <Dots length={2} active={1} />
-                </View>
-              </View>
-            </ScrollView>
           </ScrollView>
-        </View>
+        </ScrollView>
       </View>
-    );
-  }
+    </View>
+  );
 }
+/* } */
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "rgba(51, 102, 255, 0.73)",
+    alignItems: "center",
+    width: screenWidth,
+    elevation: 1,
+  },
   regform: {
     width: screenWidth,
     alignSelf: "stretch",
@@ -403,12 +405,6 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: "red",
-  },
-  container: {
-    flex: 1,
-    backgroundColor: "rgba(51, 102, 255, 0.73)",
-    alignItems: "center",
-    width: screenWidth,
   },
   header: {
     fontSize: 45,
