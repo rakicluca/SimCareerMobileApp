@@ -16,7 +16,7 @@ import {
 } from "react-native";
 import { Button, Icon } from "react-native-elements";
 import { createStackNavigator } from "@react-navigation/stack";
-import Info from "./info";
+import Info from "./info_Campionato";
 import ClassificaCampionati from "./classifiche_Campionati";
 import Gare from "./gare";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
@@ -149,7 +149,10 @@ const HomeTabNavScreen = () => (
     <HomeTabNav.Screen
       name="Gare"
       component={Gare}
-      initialParams={{ listaGare: getData("listagare") }}
+      initialParams={{
+        listaGare: getData("listagare"),
+        calendario: getData("campionato").calendario,
+      }}
     ></HomeTabNav.Screen>
     <HomeTabNav.Screen
       name="Classifiche"

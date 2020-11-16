@@ -60,7 +60,7 @@ function getGare(navigation, idCampionato, filter, setClassificaChamp) {
   getData();
 }
 
-export default function Gare({ navigation, route }) {
+export default function classiche_Campionati({ navigation, route }) {
   const [filter, setFilter] = useState(0);
   const [classificaChamp, setClassificaChamp] = useState([]);
   let itemRenderPiloti = ({ item, index }) => (

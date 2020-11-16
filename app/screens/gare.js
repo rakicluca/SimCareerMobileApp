@@ -14,11 +14,19 @@ import {
   TouchableHighlight,
 } from "react-native";
 import { Button, ListItem, Avatar } from "react-native-elements";
-import { TouchableWithoutFeedback } from "react-native-gesture-handler";
+import syncStorage from "sync-storage";
 import config from "../config/config";
 let width = Dimensions.get("screen").width;
 
-function getGare(navigation, listaGare) {
+function getMeteo(calendario, idGara) {
+  let meteo = [];
+  calendario.forEach((element) => {
+    if (element.idCircuito == idGara) meteo.push(element.meteo);
+  });
+  return meteo;
+}
+
+function getGare(navigation, listaGare, calendario) {
   let [listCircuiti, setListCircuiti] = useState([]);
   React.useEffect(() => {
     let idList = [];
@@ -50,7 +58,14 @@ function getGare(navigation, listaGare) {
   }, []);
   let itemRender = ({ item, index }) => (
     <ListItem
-      onPress={() => navigation.push("Gara")}
+      onPress={() => {
+        syncStorage.set("gara", JSON.stringify(item));
+        navigation.push("Gara", {
+          campionato: JSON.parse(syncStorage.get("campionato")),
+          gara: item,
+          index: index,
+        });
+      }}
       Component={TouchableOpacity}
       bottomDivider
       containerStyle={{ backgroundColor: "rgba(51, 102, 255)" }}
@@ -72,9 +87,16 @@ function getGare(navigation, listaGare) {
         >
           {item.nome}
         </ListItem.Title>
-        <ListItem.Subtitle style={{ alignSelf: "center", color: "white" }}>
-          {item.meteo}
-        </ListItem.Subtitle>
+
+        <Image
+          source={{ uri: "http://openweathermap.org/img/wn/10d@2x.png" }}
+          style={{
+            width: 60,
+            height: 60,
+            resizeMode: "contain",
+            alignSelf: "center",
+          }}
+        />
       </ListItem.Content>
       <ListItem.Title
         style={{ alignSelf: "center", color: "white", fontSize: 14 }}
@@ -100,7 +122,7 @@ export default function Gare({ navigation, route }) {
         backgroundColor: "rgba(51, 102, 255, 0.6)",
       }}
     >
-      {getGare(navigation, route.params.listaGare)}
+      {getGare(navigation, route.params.listaGare, route.params.calendario)}
     </View>
   );
 }
