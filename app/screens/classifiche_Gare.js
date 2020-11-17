@@ -17,7 +17,12 @@ import { Button, ListItem, Avatar } from "react-native-elements";
 import config from "../config/config";
 let width = Dimensions.get("screen").width;
 
-function getGare(navigation, idCampionato, idGara, setClassificaGare) {
+function getClassificheGare(
+  navigation,
+  idCampionato,
+  idGara,
+  setClassificaGare
+) {
   //CHIAMATA DB
   async function getData() {
     await fetch(config.url.path + "/campionati/" + idCampionato)
@@ -51,10 +56,21 @@ function getGare(navigation, idCampionato, idGara, setClassificaGare) {
       });
   }
   getData();
+  console.log("dentro getgare classic");
 }
 
 export default function Classifiche_Gare({ navigation, route }) {
   const [classificaGare, setClassificaGare] = useState([]);
+  React.useEffect(() => {
+    console.log("dentro useeffect gare");
+    getClassificheGare(
+      navigation,
+      route.params.idCampionato,
+      route.params.idGara,
+      setClassificaGare
+    );
+  }, []);
+  //console.log(classificaGare);
   let itemRenderPiloti = ({ item, index }) => (
     //Lista Piloti
     <ListItem
@@ -80,20 +96,11 @@ export default function Classifiche_Gare({ navigation, route }) {
       <ListItem.Title style={[styles.testo]}>{item.tempo}</ListItem.Title>
     </ListItem>
   );
-  React.useEffect(() => {
-    getGare(
-      navigation,
-      route.params.idCampionato,
-      route.params.idGara,
-      setClassificaGare
-    );
-  }, []);
 
   return (
     <View
       style={{
         flex: 1,
-
         backgroundColor: "rgba(51, 102, 255, 0.6)",
       }}
     >

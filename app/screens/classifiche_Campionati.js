@@ -59,62 +59,83 @@ function getGare(navigation, idCampionato, filter, setClassificaChamp) {
   }
   getData();
 }
+function renderItem(filter, classificaChamp) {
+  if (filter == 0) {
+    let itemRenderPiloti = ({ item, index }) => (
+      //Lista Piloti
+      <ListItem
+        //onPress={() => navigation.push("Pilota")}
+        Component={TouchableOpacity}
+        bottomDivider
+        containerStyle={{ backgroundColor: "rgba(51, 102, 255)" }}
+      >
+        <Avatar
+          source={{
+            uri: config.url.path + "/img/work_in_progress.jpg",
+          }}
+          size={45}
+          rounded
+          avatarStyle={{ resizeMode: "cover" }}
+        ></Avatar>
+        <ListItem.Content>
+          <ListItem.Title style={styles.testo}>{item.nome}</ListItem.Title>
+          <ListItem.Subtitle style={[styles.testo, { fontSize: 12 }]}>
+            {item.team}
+          </ListItem.Subtitle>
+        </ListItem.Content>
+        <ListItem.Title style={[styles.testo]}>{item.punti}</ListItem.Title>
+      </ListItem>
+    );
+    return (
+      <FlatList
+        keyExtractor={(item, index) => index.toString()}
+        data={classificaChamp}
+        renderItem={itemRenderPiloti}
+      ></FlatList>
+    );
+  } else {
+    let itemRenderTeam = (
+      { item } //Lista Team
+    ) => (
+      <ListItem
+        //onPress={() => navigation.push("Team")}
+        Component={TouchableOpacity}
+        bottomDivider
+        containerStyle={{ backgroundColor: "rgba(51, 102, 255)" }}
+      >
+        <Avatar
+          source={{
+            uri: config.url.path + "/img/work_in_progress.jpg",
+          }}
+          size={45}
+          rounded
+          avatarStyle={{ resizeMode: "cover" }}
+        ></Avatar>
+        <ListItem.Content>
+          <ListItem.Title style={styles.testo}>{item.team}</ListItem.Title>
+          <ListItem.Subtitle style={[styles.testo, { fontSize: 12 }]}>
+            {item.auto}
+          </ListItem.Subtitle>
+        </ListItem.Content>
+        <ListItem.Title style={[styles.testo]}>{item.punti}</ListItem.Title>
+      </ListItem>
+    );
+    return (
+      <FlatList
+        keyExtractor={(item, index) => index.toString()}
+        data={classificaChamp}
+        renderItem={itemRenderTeam}
+      ></FlatList>
+    );
+  }
+}
 
 export default function classiche_Campionati({ navigation, route }) {
   const [filter, setFilter] = useState(0);
   const [classificaChamp, setClassificaChamp] = useState([]);
-  let itemRenderPiloti = ({ item, index }) => (
-    //Lista Piloti
-    <ListItem
-      //onPress={() => navigation.push("Pilota")}
-      Component={TouchableOpacity}
-      bottomDivider
-      containerStyle={{ backgroundColor: "rgba(51, 102, 255)" }}
-    >
-      <Avatar
-        source={{
-          uri: config.url.path + "/img/work_in_progress.jpg",
-        }}
-        size={45}
-        rounded
-        avatarStyle={{ resizeMode: "cover" }}
-      ></Avatar>
-      <ListItem.Content>
-        <ListItem.Title style={styles.testo}>{item.nome}</ListItem.Title>
-        <ListItem.Subtitle style={[styles.testo, { fontSize: 12 }]}>
-          {item.team}
-        </ListItem.Subtitle>
-      </ListItem.Content>
-      <ListItem.Title style={[styles.testo]}>{item.punti}</ListItem.Title>
-    </ListItem>
-  );
-  let itemRenderTeam = (
-    { item } //Lista Team
-  ) => (
-    <ListItem
-      //onPress={() => navigation.push("Team")}
-      Component={TouchableOpacity}
-      bottomDivider
-      containerStyle={{ backgroundColor: "rgba(51, 102, 255)" }}
-    >
-      <Avatar
-        source={{
-          uri: config.url.path + "/img/work_in_progress.jpg",
-        }}
-        size={45}
-        rounded
-        avatarStyle={{ resizeMode: "cover" }}
-      ></Avatar>
-      <ListItem.Content>
-        <ListItem.Title style={styles.testo}>{item.team}</ListItem.Title>
-        <ListItem.Subtitle style={[styles.testo, { fontSize: 12 }]}>
-          {item.auto}
-        </ListItem.Subtitle>
-      </ListItem.Content>
-      <ListItem.Title style={[styles.testo]}>{item.punti}</ListItem.Title>
-    </ListItem>
-  );
-  getGare(navigation, route.params.idCampionato, filter, setClassificaChamp);
+  React.useEffect(() => {
+    getGare(navigation, route.params.idCampionato, filter, setClassificaChamp);
+  }, [filter]);
 
   return (
     <View
@@ -144,11 +165,7 @@ export default function classiche_Campionati({ navigation, route }) {
         />
       </View>
 
-      <FlatList
-        keyExtractor={(item, index) => index.toString()}
-        data={classificaChamp}
-        renderItem={filter == 0 ? itemRenderPiloti : itemRenderTeam}
-      ></FlatList>
+      {renderItem(filter, classificaChamp)}
     </View>
   );
 }

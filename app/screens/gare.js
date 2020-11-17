@@ -89,7 +89,7 @@ function getGare(navigation, listaGare, calendario) {
         </ListItem.Title>
 
         <Image
-          source={{ uri: "http://openweathermap.org/img/wn/10d@2x.png" }}
+          source={{ uri: "http://openweathermap.org/img/wn/"+calendario[index].meteo.weather[0].icon+"@2x.png" }}
           style={{
             width: 60,
             height: 60,

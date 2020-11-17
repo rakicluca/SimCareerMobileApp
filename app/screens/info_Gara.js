@@ -28,7 +28,42 @@ function getMeteo(calendario, idGara) {
   calendario.forEach((element) => {
     if (element.idCircuito == idGara) meteo.push(element.meteo);
   });
-  return meteo;
+  return (
+    <>
+      <View style={styles.garaText}>
+        <Text style={styles.testo}>Previsione: </Text>
+        <Text style={styles.testoValore}>
+          {meteo[0].weather[0].description}
+        </Text>
+      </View>
+      <View style={styles.garaText}>
+        <Text style={styles.testo}>Temperatura min: </Text>
+        <Text style={styles.testoValore}>{meteo[0].temp.min}</Text>
+      </View>
+      <View style={styles.garaText}>
+        <Text style={styles.testo}>Temperatura max: </Text>
+        <Text style={styles.testoValore}>{meteo[0].temp.max}</Text>
+      </View>
+      <View style={styles.garaText}>
+        <Text style={styles.testo}>Umidità: </Text>
+        <Text style={styles.testoValore}>
+          {meteo[0].humidity}
+          {"%"}
+        </Text>
+      </View>
+      <View style={styles.garaText}>
+        <Text style={styles.testo}>Velocità del vento: </Text>
+        <Text style={styles.testoValore}>{meteo[0].wind_speed}</Text>
+      </View>
+      <View style={styles.garaText}>
+        <Text style={styles.testo}>Pioggia: </Text>
+        <Text style={styles.testoValore}>
+          {meteo[0].rain}
+          {"mm"}
+        </Text>
+      </View>
+    </>
+  );
 }
 
 export default function infoGara({ route }) {
@@ -51,15 +86,12 @@ export default function infoGara({ route }) {
           <Text style={styles.testo}>Lunghezza circuito:</Text>
           <Text style={styles.testoValore}> {route.params.gara.km} km</Text>
         </View>
-        <View style={styles.garaText}>
-          <Text style={styles.testo}>Meteo:</Text>
-          <Text style={styles.testoValore}>
-            {" "}
-            {getMeteo(
-              route.params.campionato.calendario,
-              route.params.gara.idCircuito
-            )}
-          </Text>
+        <View style={styles.infoMeteo}>
+          <Text style={styles.meteoTitle}>Meteo</Text>
+          {getMeteo(
+            route.params.campionato.calendario,
+            route.params.gara.idCircuito
+          )}
         </View>
       </View>
       <View style={styles.forumLink}>
@@ -103,7 +135,18 @@ const styles = StyleSheet.create({
   },
   infoGara: { marginTop: "5%" },
   infoGaraText: { justifyContent: "center", alignItems: "center" },
+  infoMeteo: {
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: "5%",
+    flexDirection: "column",
+  },
   garaText: {
     flexDirection: "row",
+  },
+  meteoTitle: {
+    fontSize: 20,
+    color: "white",
+    fontWeight: "bold",
   },
 });
