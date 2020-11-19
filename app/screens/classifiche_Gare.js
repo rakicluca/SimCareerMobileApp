@@ -17,12 +17,7 @@ import { Button, ListItem, Avatar } from "react-native-elements";
 import config from "../config/config";
 let width = Dimensions.get("screen").width;
 
-function getClassificheGare(
-  navigation,
-  idCampionato,
-  idGara,
-  setClassificaGare
-) {
+function getClassificheGare(idCampionato, idGara, setClassificaGare) {
   //CHIAMATA DB
   async function getData() {
     await fetch(config.url.path + "/campionati/" + idCampionato)
@@ -64,7 +59,6 @@ export default function Classifiche_Gare({ navigation, route }) {
   React.useEffect(() => {
     console.log("dentro useeffect gare");
     getClassificheGare(
-      navigation,
       route.params.idCampionato,
       route.params.idGara,
       setClassificaGare

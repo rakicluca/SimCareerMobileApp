@@ -9,6 +9,7 @@ import Home from "../screens/home.js";
 import Classifiche from "../screens/classifiche.js";
 import Galleria from "../screens/galleria.js";
 import Profilo from "../screens/profilo";
+import GridGallery from "../screens/gridGallery";
 import { Text, Dimensions } from "react-native";
 import { color } from "react-native-reanimated";
 
@@ -18,6 +19,7 @@ const LoginStackScreen = () => (
     <LoginStack.Screen name="LoginForm" component={LogForm} />
     <LoginStack.Screen name="RegistrationForm" component={RegForm} />
     <LoginStack.Screen name="AppTabs" component={AppTabsScreen} />
+    <LoginStack.Screen name="GridGallery" component={GridGallery} />
   </LoginStack.Navigator>
 );
 

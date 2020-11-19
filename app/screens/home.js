@@ -20,10 +20,7 @@ import {
   RefreshControl,
 } from "react-native";
 import { Avatar, Button } from "react-native-elements";
-import { render } from "react-dom";
 import { ListItem } from "react-native-elements";
-import AsyncStorage from "@react-native-community/async-storage";
-import { it, is } from "date-fns/locale";
 import config from "../config/config";
 import Campionati from "./campionati.js";
 import syncStorage from "sync-storage";
