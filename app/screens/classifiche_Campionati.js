@@ -59,6 +59,50 @@ function getGare(navigation, idCampionato, filter, setClassificaChamp) {
   }
   getData();
 }
+
+function setPosizione(index) {
+  let posizione;
+  switch (index + 1) {
+    case 1:
+      posizione = (
+        <ListItem.Title
+          style={{
+            color: "#C9B037",
+            fontSize: 25,
+            fontWeight: "bold",
+          }}
+        >
+          {index + 1}
+        </ListItem.Title>
+      );
+      break;
+    case 2:
+      posizione = (
+        <ListItem.Title
+          style={{ color: "#B4B4B4", fontSize: 25, fontWeight: "bold" }}
+        >
+          {index + 1}
+        </ListItem.Title>
+      );
+      break;
+    case 3:
+      posizione = (
+        <ListItem.Title
+          style={{ color: "#AD8A56", fontSize: 25, fontWeight: "bold" }}
+        >
+          {index + 1}
+        </ListItem.Title>
+      );
+      break;
+    default:
+      posizione = (
+        <ListItem.Title style={[styles.testo, { marginRight: "1.5%" }]}>
+          {index + 1}
+        </ListItem.Title>
+      );
+  }
+  return posizione;
+}
 function renderItem(filter, classificaChamp) {
   if (filter == 0) {
     let itemRenderPiloti = ({ item, index }) => (
@@ -69,6 +113,8 @@ function renderItem(filter, classificaChamp) {
         bottomDivider
         containerStyle={{ backgroundColor: "rgba(51, 102, 255)" }}
       >
+        {setPosizione(index)}
+
         <Avatar
           source={{
             uri: config.url.path + "/img/work_in_progress.jpg",
@@ -95,7 +141,7 @@ function renderItem(filter, classificaChamp) {
     );
   } else {
     let itemRenderTeam = (
-      { item } //Lista Team
+      { item, index } //Lista Team
     ) => (
       <ListItem
         //onPress={() => navigation.push("Team")}
@@ -103,6 +149,8 @@ function renderItem(filter, classificaChamp) {
         bottomDivider
         containerStyle={{ backgroundColor: "rgba(51, 102, 255)" }}
       >
+        {setPosizione(index)}
+
         <Avatar
           source={{
             uri: config.url.path + "/img/work_in_progress.jpg",

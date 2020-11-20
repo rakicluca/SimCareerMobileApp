@@ -54,6 +54,50 @@ function getClassificheGare(idCampionato, idGara, setClassificaGare) {
   console.log("dentro getgare classic");
 }
 
+function setPosizione(index) {
+  let posizione;
+  switch (index + 1) {
+    case 1:
+      posizione = (
+        <ListItem.Title
+          style={{
+            color: "#C9B037",
+            fontSize: 25,
+            fontWeight: "bold",
+          }}
+        >
+          {index + 1}
+        </ListItem.Title>
+      );
+      break;
+    case 2:
+      posizione = (
+        <ListItem.Title
+          style={{ color: "#B4B4B4", fontSize: 25, fontWeight: "bold" }}
+        >
+          {index + 1}
+        </ListItem.Title>
+      );
+      break;
+    case 3:
+      posizione = (
+        <ListItem.Title
+          style={{ color: "#AD8A56", fontSize: 25, fontWeight: "bold" }}
+        >
+          {index + 1}
+        </ListItem.Title>
+      );
+      break;
+    default:
+      posizione = (
+        <ListItem.Title style={[styles.testo, { marginRight: "1.5%" }]}>
+          {index + 1}
+        </ListItem.Title>
+      );
+  }
+  return posizione;
+}
+
 export default function Classifiche_Gare({ navigation, route }) {
   const [classificaGare, setClassificaGare] = useState([]);
   React.useEffect(() => {
@@ -73,6 +117,7 @@ export default function Classifiche_Gare({ navigation, route }) {
       bottomDivider
       containerStyle={{ backgroundColor: "rgba(51, 102, 255)" }}
     >
+      {setPosizione(index)}
       <Avatar
         source={{
           uri: config.url.path + "/img/work_in_progress.jpg",
