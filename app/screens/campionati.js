@@ -35,6 +35,8 @@ function getData(dataName) {
 
 async function sub_ToChamp(idCampionato, pickedTeam, pickedVettura) {
   let idutente = SyncStorage.get("utente").id;
+  let nomeUtente = SyncStorage.get("utente").nome;
+  let cognomeUtente = SyncStorage.get("utente").cognome;
 
   await fetch(config.url.path + "/campionati/iscriviToChamp/" + idCampionato, {
     method: "POST",
@@ -47,6 +49,7 @@ async function sub_ToChamp(idCampionato, pickedTeam, pickedVettura) {
       idUtente: idutente,
       auto: pickedVettura,
       team: pickedTeam,
+      nome: nomeUtente + " " + cognomeUtente,
     }),
   }).then((response) => {
     if (response.status === 200) {

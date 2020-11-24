@@ -2,15 +2,11 @@ import config from "../config/config";
 import React from "react";
 import { View, StyleSheet, FlatList, TouchableOpacity } from "react-native";
 import { Avatar, Image, ListItem } from "react-native-elements";
-import GridList from "react-native-grid-list";
 import { SafeAreaView } from "react-native-safe-area-context";
-import * as Sharing from "expo-sharing";
-import { cacheDirectory, downloadAsync } from "expo-file-system";
-import syncStorage from "sync-storage";
 
-function getCampionatiByUtente(idUtente, setListaCampionati) {
+function getCampionatiByUtente(setListaCampionati) {
   async function getData() {
-    await fetch(config.url.path + "/campionati/myChamp/" + idUtente)
+    await fetch(config.url.path + "/campionati/champStarted/all")
       .then((response) => {
         if (response.status === 200) {
           return response.json();
@@ -29,10 +25,9 @@ function getCampionatiByUtente(idUtente, setListaCampionati) {
 
 export default function Gallery({ navigation, route }) {
   const [listaCampionati, setListaCampionati] = React.useState([]);
-  let idUtente = syncStorage.get("utente").id;
 
   React.useEffect(() => {
-    getCampionatiByUtente(idUtente, setListaCampionati);
+    getCampionatiByUtente(setListaCampionati);
   }, []);
 
   let itemRender = ({ item }) => (
