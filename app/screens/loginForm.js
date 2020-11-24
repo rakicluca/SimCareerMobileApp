@@ -16,7 +16,8 @@ import {
   Platform,
   Keyboard,
 } from "react-native";
-import { Button } from "react-native-elements";
+import { Button, Icon, Input } from "react-native-elements";
+import Modal from "react-native-modal";
 import AsyncStorage from "@react-native-community/async-storage";
 import config from "../config/config";
 import syncStorage from "sync-storage";
@@ -97,6 +98,11 @@ export default function LoginForm({ navigation }) {
   });
   //Checkbox Settings
   const [toggleCheckBox, setToggleCheckBox] = React.useState(false);
+
+  const [isVisible, setIsVisible] = React.useState(false);
+  const [email_for_reset, setEmail_for_reset] = React.useState("");
+  const [errorMessage, setErrorMessage] = React.useState("");
+
   if (!isLoaded) {
     return <AppLoading />;
   } else {
@@ -202,9 +208,56 @@ export default function LoginForm({ navigation }) {
                 Non ti sei ancora registrato? Registrati!
               </Text>
             </TouchableOpacity>
-            <Text style={styles.passwordDimenticataText}>
+            <Text
+              style={styles.passwordDimenticataText}
+              onPress={() => {
+                setIsVisible(true);
+              }}
+            >
               Passowrd dimenticata?
             </Text>
+            {/* MODAL FOR RECOVERY PASSWORD */}
+            <Modal
+              isVisible={isVisible}
+              onBackdropPress={() => {
+                setIsVisible(false);
+                setErrorMessage("");
+              }}
+            >
+              <View style={styles.modalContainer}>
+                <Text style={styles.modalTitle}>Resetta la tua password</Text>
+                <View style={styles.modalContent}>
+                  <View style={styles.modalBody}>
+                    <Input
+                      placeholder="Inserisci la tua mail"
+                      leftIcon={<Icon name="email" size={22}></Icon>}
+                      onChangeText={(value) => setEmail_for_reset(value)}
+                      errorMessage={errorMessage}
+                    ></Input>
+                  </View>
+                </View>
+                <View style={styles.modalBottom}>
+                  <Button
+                    title="Invia"
+                    buttonStyle={{
+                      width: screenWidth / 3,
+                    }}
+                    type="outline"
+                    titleStyle={{ color: "#00BCD4", fontSize: 20 }}
+                    onPress={() => {
+                      sendEmailForResetPassword(email_for_reset).then((res) => {
+                        if (res.status == "404")
+                          setErrorMessage("Email non registrata");
+                        else {
+                          setIsVisible(false);
+                          setErrorMessage("");
+                        }
+                      });
+                    }}
+                  ></Button>
+                </View>
+              </View>
+            </Modal>
           </View>
         </ScrollView>
       </View>
@@ -284,6 +337,32 @@ const styles = StyleSheet.create({
   loginErrorText: {
     color: "red",
   },
+  modalContainer: {
+    backgroundColor: "white",
+    //height: heigth > 800 ? heigth / 3.5 : heigth / 3,
+    width: "100%",
+    padding: "5%",
+  },
+  modalContent: { marginTop: "5%" },
+  modalTitle: {
+    fontSize: 22,
+  },
+  modalBody: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  modalText: {
+    fontSize: 18,
+  },
+  modalBottom: {
+    alignItems: "center",
+    marginTop: screenHight > 800 ? "10%" : "5%",
+  },
+  modalButton: {
+    fontSize: 25,
+    fontWeight: "bold",
+    color: "#00BCD4",
+  },
 });
 
 async function setRememberMe(username, password) {
@@ -313,4 +392,19 @@ async function getRememberedUser() {
   } catch (error) {
     // Error retrieving data
   }
+}
+
+async function sendEmailForResetPassword(email) {
+  console.log(email);
+  return await fetch("http://192.168.1.7:3000/utenti/reset", {
+    method: "POST",
+    dataType: "json",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      email: email,
+    }),
+  });
 }
