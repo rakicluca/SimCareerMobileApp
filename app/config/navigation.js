@@ -6,12 +6,13 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import RegForm from "../screens/RegForm.js";
 import LogForm from "../screens/loginForm.js";
 import Home from "../screens/home.js";
-import Classifiche from "../screens/classifiche.js";
+import MyChamp from "../screens/myChamp.js";
 import Galleria from "../screens/galleria.js";
 import Profilo from "../screens/profilo";
 import GridGallery from "../screens/gridGallery";
 import { Text, Dimensions } from "react-native";
 import { color } from "react-native-reanimated";
+import Campionati from "../screens/campionati.js";
 
 const LoginStack = createStackNavigator();
 const LoginStackScreen = () => (
@@ -20,6 +21,7 @@ const LoginStackScreen = () => (
     <LoginStack.Screen name="RegistrationForm" component={RegForm} />
     <LoginStack.Screen name="AppTabs" component={AppTabsScreen} />
     <LoginStack.Screen name="GridGallery" component={GridGallery} />
+    <LoginStack.Screen name="Campionati" component={Campionati} />
   </LoginStack.Navigator>
 );
 
@@ -48,8 +50,8 @@ const AppTabsScreen = () => (
     }}
   >
     <AppTabs.Screen
-      name="Classifiche"
-      component={Classifiche}
+      name="My Champ"
+      component={MyChamp}
       options={{
         tabBarIcon: ({ color }) => (
           <Icon size={30} name="list" color={color}></Icon>

@@ -34,7 +34,7 @@ export default function Gallery({ navigation, route }) {
     <ListItem
       Component={TouchableOpacity}
       onPress={() => {
-        navigation.push("GridGallery", { items: item.foto });
+        navigation.push("Campionati", { campionato: item });
       }}
       bottomDivider
       containerStyle={{ backgroundColor: "rgba(51, 102, 255,0.5)" }}
