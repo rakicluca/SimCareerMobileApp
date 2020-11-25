@@ -3,10 +3,13 @@ import React from "react";
 import { View, StyleSheet, FlatList, TouchableOpacity } from "react-native";
 import { Avatar, Image, ListItem } from "react-native-elements";
 import { SafeAreaView } from "react-native-safe-area-context";
+import syncStorage from "sync-storage";
 
 function getCampionatiByUtente(setListaCampionati) {
   async function getData() {
-    await fetch(config.url.path + "/campionati/champStarted/all")
+    await fetch(
+      config.url.path + "/campionati/myChamp/" + syncStorage.get("utente").id
+    )
       .then((response) => {
         if (response.status === 200) {
           return response.json();
@@ -23,12 +26,12 @@ function getCampionatiByUtente(setListaCampionati) {
   getData();
 }
 
-export default function Gallery({ navigation, route }) {
+export default function myChamp({ navigation, route }) {
   const [listaCampionati, setListaCampionati] = React.useState([]);
 
   React.useEffect(() => {
     getCampionatiByUtente(setListaCampionati);
-  }, []);
+  }, [listaCampionati]);
 
   let itemRender = ({ item }) => (
     <ListItem

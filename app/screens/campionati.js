@@ -24,6 +24,7 @@ import SyncStorage from "sync-storage";
 import config from "../config/config";
 import Modal from "react-native-modal";
 import DropDownPicker from "react-native-dropdown-picker";
+import syncStorage from "sync-storage";
 
 let width = Dimensions.get("screen").width;
 let heigth = Dimensions.get("screen").height;
@@ -31,6 +32,21 @@ let heigth = Dimensions.get("screen").height;
 function getData(dataName) {
   let data = SyncStorage.get(dataName);
   return JSON.parse(data);
+}
+
+async function updateLocalCampionato(idCampionato, setNumeroPartecipanti) {
+  await fetch(config.url.path + "/campionati/" + idCampionato)
+    .then((response) => {
+      if (response.status === 200) {
+        return response.json();
+      } else {
+        console.log("status not 200");
+      }
+    })
+    .then((res) => {
+      syncStorage.set("campionato", JSON.stringify(res));
+      setNumeroPartecipanti(res.piloti_iscritti.length);
+    });
 }
 
 async function sub_ToChamp(idCampionato, pickedTeam, pickedVettura) {
@@ -170,7 +186,7 @@ const HomeTabNavScreen = () => (
     ></HomeTabNav.Screen>
   </HomeTabNav.Navigator>
 );
-export default function Campionati({ route }) {
+export default function Campionati({ navigation, route }) {
   let logoURL = route.params.campionato.logo;
   let gare = route.params.campionato.calendario;
   let listaVettureChamp = getListaVetture(route.params.campionato.lista_auto);
@@ -179,7 +195,11 @@ export default function Campionati({ route }) {
   const [isVisible, setIsVisible] = useState(false);
   const [pickedVettura, setPickedVettura] = useState([]);
   const [pickedTeam, setPickedTeam] = useState([]);
+  const [numero_partecipanti, setNumeroPartecipanti] = useState(
+    getData("campionato").piloti_iscritti.length
+  );
   React.useEffect(() => {
+    //updateLocalCampionato(route.params.campionato.id, setNumeroPartecipanti);
     getListaTeam().then((res) => {
       let tmp = createArrayTeam(res);
       setListaTeam(tmp);
@@ -263,6 +283,11 @@ export default function Campionati({ route }) {
                     ).then(() => {
                       setIsSub(true);
                       setIsVisible(false);
+                      updateLocalCampionato(
+                        route.params.campionato.id,
+                        setNumeroPartecipanti
+                      );
+                      //navigation.goBack();
                     });
                   }
                 }}
@@ -307,8 +332,7 @@ export default function Campionati({ route }) {
               {route.params.campionato.nome}
             </Text>
             <Text style={styles.infoCampionato}>
-              Numero di partecipanti:{" "}
-              {route.params.campionato.piloti_iscritti.length}
+              Numero di partecipanti: {numero_partecipanti}
             </Text>
             <Text style={styles.infoCampionato}>
               Data inizio/prima gara:{" "}
@@ -328,6 +352,7 @@ export default function Campionati({ route }) {
         >
           {/* TABELLA CON LE GARE */}
           <ChampionStackScreen></ChampionStackScreen>
+          {/* FINE TABELLA CON LE GARE */}
           <View style={{ marginVertical: "4%" }}>
             <Button
               buttonStyle={styles.buttonIscriviti}
@@ -336,9 +361,13 @@ export default function Campionati({ route }) {
               onPress={() => {
                 if (!isSub) setIsVisible(true);
                 else {
-                  removeUtenteFromChamp(route.params.campionato.id).then(
-                    setIsSub(false)
-                  );
+                  removeUtenteFromChamp(route.params.campionato.id).then(() => {
+                    setIsSub(false);
+                    updateLocalCampionato(
+                      route.params.campionato.id,
+                      setNumeroPartecipanti
+                    );
+                  });
                 }
               }}
             ></Button>
