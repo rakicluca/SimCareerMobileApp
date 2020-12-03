@@ -51,7 +51,6 @@ function getClassificheGare(idCampionato, idGara, setClassificaGare) {
       });
   }
   getData();
-  console.log("dentro getgare classic");
 }
 
 function setPosizione(index) {

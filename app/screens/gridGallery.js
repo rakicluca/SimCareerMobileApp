@@ -8,6 +8,7 @@ import { cacheDirectory, downloadAsync } from "expo-file-system";
 
 export default function GridGallery({ route }) {
   let items = route.params.items;
+  console.log(items);
   let renderItem = ({ item, index }) => (
     <Image
       style={styles.image}

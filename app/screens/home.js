@@ -1,10 +1,9 @@
 import React from "react";
-import { useForm, Controller } from "react-hook-form";
-import { CommonActions } from "@react-navigation/native";
-import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import Icon from "react-native-vector-icons/FontAwesome5";
+import * as Notifications from "expo-notifications";
+
 import {
   StyleSheet,
   Text,
@@ -32,7 +31,6 @@ const ChampionStackScreen = () => (
   <ChampionStack.Navigator headerMode={"none"}>
     <ChampionStack.Screen name="Home" component={HomeTabNavScreen} />
     <ChampionStack.Screen name="Campionati" component={Campionati} />
-    {/* <ChampionStack.Screen name="Gare" component={Gare} /> */}
     <ChampionStack.Screen name="Gara" component={Gara} />
   </ChampionStack.Navigator>
 );
@@ -291,12 +289,71 @@ const addPreferiti = () => {
         console.log("status not 200");
       }
     });
-    console.log(listaPreferiti);
   } catch (error) {
     console.error(error);
   }
 };
-
 export default function Home({ navigation }) {
+  //this method will be called whenever a user interacts with a notification (eg. taps on it).
+  Notifications.addNotificationResponseReceivedListener((response) => {
+    console.log("OH YEAH");
+    switch (response.notification.request.content.data.type) {
+      case "campionato":
+        {
+          fetch(
+            config.url.path +
+              "/campionati/" +
+              response.notification.request.content.data.id
+          )
+            .then((res) => {
+              return res.json();
+            })
+            .then((res) => {
+              syncStorage.set("campionato", JSON.stringify(res));
+              syncStorage.set("listagare", JSON.stringify(res.calendario));
+              navigation.navigate("Campionati", { campionato: res });
+            });
+        }
+        break;
+      case "gara":
+        {
+          /* 
+          {
+            fetch(
+              config.url.path +
+                "/campionati/" +
+                response.notification.request.content.data.id
+            )
+              .then((res) => {
+                return res.json();
+              })
+              .then((res) => {
+                syncStorage.set("campionato", JSON.stringify(res));
+                navigation.navigate("Gara", { gara: res });
+              });
+          } */
+        }
+        break;
+      case "galleria":
+        {
+          {
+            fetch(
+              config.url.path +
+                "/campionati/" +
+                response.notification.request.content.data.id
+            )
+              .then((res) => {
+                return res.json();
+              })
+              .then((res) => {
+                syncStorage.set("campionato", JSON.stringify(res));
+                navigation.navigate("GridGallery", { items: res.foto });
+              });
+          }
+        }
+        break;
+    }
+  });
+
   return <ChampionStackScreen />;
 }

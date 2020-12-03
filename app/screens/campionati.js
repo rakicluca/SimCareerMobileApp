@@ -169,7 +169,6 @@ const HomeTabNavScreen = () => (
       name="Gare"
       component={Gare}
       initialParams={{
-        listaGare: getData("listagare"),
         calendario: getData("campionato").calendario,
       }}
     ></HomeTabNav.Screen>
@@ -199,7 +198,6 @@ export default function Campionati({ navigation, route }) {
     getData("campionato").piloti_iscritti.length
   );
   React.useEffect(() => {
-    //updateLocalCampionato(route.params.campionato.id, setNumeroPartecipanti);
     getListaTeam().then((res) => {
       let tmp = createArrayTeam(res);
       setListaTeam(tmp);

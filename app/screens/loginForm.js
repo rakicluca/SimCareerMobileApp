@@ -21,9 +21,38 @@ import Modal from "react-native-modal";
 import AsyncStorage from "@react-native-community/async-storage";
 import config from "../config/config";
 import syncStorage from "sync-storage";
+import * as Permissions from "expo-permissions";
+import * as Notifications from "expo-notifications";
 
 let screenWidth = Dimensions.get("window").width;
 let screenHight = Dimensions.get("window").height;
+
+const registerForPushNotifications = async (utente) => {
+  const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+  if (status !== "granted") {
+    alert("No notification permissions!");
+    return;
+  }
+
+  // Get the token that identifies this device
+  let token = await Notifications.getExpoPushTokenAsync();
+  console.log(token);
+
+  // POST the token to your backend server from where you can retrieve it to send push notifications.
+  return await fetch(config.url.path + "/utenti/token", {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      token: {
+        value: token.data,
+      },
+      idUtente: utente.id,
+    }),
+  });
+};
 
 export default function LoginForm({ navigation }) {
   //Form Settings
@@ -40,7 +69,6 @@ export default function LoginForm({ navigation }) {
   React.useEffect(() => {
     async function rememberMeOnLoad() {
       const login = await getRememberedUser();
-      console.log(login);
       if (login != undefined) {
         reset({ username: login.username, password: login.password });
         setToggleCheckBox(true);
@@ -82,6 +110,7 @@ export default function LoginForm({ navigation }) {
       .then((response) => {
         if (response) {
           syncStorage.set("utente", response);
+          registerForPushNotifications(response);
           navigation.dispatch(
             CommonActions.reset({
               index: 0,

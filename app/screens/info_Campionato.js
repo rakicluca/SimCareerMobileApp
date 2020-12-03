@@ -45,16 +45,20 @@ export default function Home({ route }) {
           <View
             key={key}
             style={{
-              flexDirection: "row",
               alignItems: "center",
+              justifyContent: "center",
             }}
           >
-            <Text key={key} style={styles.testo}>
-              {infoText.tipo}:{" "}
-            </Text>
-            <Text key={key + 1} style={styles.testoValore}>
-              {infoText.valore}
-            </Text>
+            <View>
+              <Text key={key} style={styles.testo}>
+                {infoText.tipo}:{" "}
+              </Text>
+            </View>
+            <View>
+              <Text key={key + 1} style={styles.testoValore}>
+                {infoText.valore}
+              </Text>
+            </View>
           </View>
         );
       })}

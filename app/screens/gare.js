@@ -89,7 +89,12 @@ function getGare(navigation, listaGare, calendario) {
         </ListItem.Title>
 
         <Image
-          source={{ uri: "http://openweathermap.org/img/wn/"+calendario[index].meteo.weather[0].icon+"@2x.png" }}
+          source={{
+            uri:
+              "http://openweathermap.org/img/wn/" +
+              calendario[index].meteo.weather[0].icon +
+              "@2x.png",
+          }}
           style={{
             width: 60,
             height: 60,
@@ -115,6 +120,7 @@ function getGare(navigation, listaGare, calendario) {
 }
 
 export default function Gare({ navigation, route }) {
+  let listaGare = syncStorage.get("listagare");
   return (
     <View
       style={{
@@ -122,7 +128,7 @@ export default function Gare({ navigation, route }) {
         backgroundColor: "rgba(51, 102, 255, 0.6)",
       }}
     >
-      {getGare(navigation, route.params.listaGare, route.params.calendario)}
+      {getGare(navigation, JSON.parse(listaGare), route.params.calendario)}
     </View>
   );
 }
