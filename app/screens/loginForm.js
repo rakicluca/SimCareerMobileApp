@@ -118,6 +118,9 @@ export default function LoginForm({ navigation }) {
             })
           );
         }
+      })
+      .catch((er) => {
+        console.log(er);
       });
   };
   //Load custom font
