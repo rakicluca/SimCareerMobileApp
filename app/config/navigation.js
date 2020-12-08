@@ -13,6 +13,7 @@ import GridGallery from "../screens/gridGallery";
 import { Text, Dimensions } from "react-native";
 import { color } from "react-native-reanimated";
 import Campionati from "../screens/campionati.js";
+import FlashMessage from "react-native-flash-message";
 
 const LoginStack = createStackNavigator();
 const LoginStackScreen = () => (
@@ -91,5 +92,6 @@ const AppTabsScreen = () => (
 export default ({ route }) => (
   <NavigationContainer>
     <LoginStackScreen />
+    <FlashMessage position="top"></FlashMessage>
   </NavigationContainer>
 );

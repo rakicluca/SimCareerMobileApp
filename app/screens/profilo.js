@@ -20,6 +20,10 @@ import syncStorage from "sync-storage";
 import { Controller, useForm } from "react-hook-form";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { Button } from "react-native-elements";
+import config from "../config/config";
+import DropDownPicker from "react-native-dropdown-picker";
+import { AppLoading } from "expo";
+import { showMessage } from "react-native-flash-message";
 
 let width = Dimensions.get("screen").width;
 let height = Dimensions.get("screen").height;
@@ -29,17 +33,88 @@ function getData(dataName) {
   return JSON.parse(data);
 }
 
+function getListaVetture(setListaVetture) {
+  let dropdown_lista = [];
+  fetch(config.url.path + "/auto")
+    .then((res) => {
+      return res.json();
+    })
+    .then((res) => {
+      res.forEach((element) => {
+        dropdown_lista.push({
+          id: element.idAuto,
+          label: element.nome,
+          value: element.idAuto,
+        });
+      });
+      setListaVetture([...dropdown_lista]);
+      return true;
+    });
+}
+async function getListaCircuiti(setListaCircuiti) {
+  let dropdown_lista = [];
+  await fetch(config.url.path + "/circuiti")
+    .then((res) => {
+      return res.json();
+    })
+    .then((res) => {
+      res.forEach((element) => {
+        dropdown_lista.push({
+          id: element.idCircuito,
+          label: element.nome,
+          value: element.idCircuito,
+        });
+      });
+      setListaCircuiti([...dropdown_lista]);
+      return true;
+    });
+}
+
 const InfoUtente = () => {
-  const { control, errors, handleSubmit, getValues, setValue } = useForm();
+  let utente = syncStorage.get("utente");
+  const { control, errors, handleSubmit, getValues, setValue } = useForm({
+    defaultValues: {
+      username: utente.username,
+      email: utente.email,
+      password: utente.password,
+      nome: utente.nome,
+      cognome: utente.cognome,
+      residenza: utente.residenza,
+      data: utente.data_nascita,
+      numero_preferito_gara: utente.numero_in_gara_preferito + "",
+    },
+  });
   const [datePickerState, setDatePickerState] = React.useState({
     visibility: false,
-    dateDisplay: "",
+    dateDisplay: utente.data_nascita,
   });
+  const [isVisible, setIsVisible] = React.useState({
+    dropAuto: false,
+    dropCircuiti: false,
+    dropCircuitiOdiati: false,
+  });
+  const [listaVetture, setListaVetture] = React.useState([]);
+  const [listaCircuiti, setListaCircuiti] = React.useState([]);
+  const [vetturaPrefPicked, setVetturaPrefPicked] = React.useState(
+    utente.id_auto_preferita
+  );
+  const [circuitoPrefPicked, setCircuitoPrefPicked] = React.useState(
+    utente.id_numero_circuito_preferito
+  );
+  const [circuitoOdiatoPicked, setCircuitoOdiatoPicked] = React.useState(
+    utente.id_numero_circuito_odiato
+  );
+
+  React.useEffect(() => {
+    getListaVetture(setListaVetture);
+    getListaCircuiti(setListaCircuiti);
+  }, []);
+
   //OnSubmit Form
   const onSubmit = (data) => {
     try {
-      fetch(config.url.path + "/utenti/", {
-        method: "POST",
+      fetch(config.url.path + "/utenti/" + utente.username, {
+        method: "PUT",
         dataType: "json",
         headers: {
           Accept: "application/json",
@@ -47,26 +122,32 @@ const InfoUtente = () => {
         },
         body: JSON.stringify([
           {
-            id: 0,
-            username: data.username,
-            email: data.email,
+            email: data.email != utente.email ? data.email : undefined,
             password: data.password,
             nome: data.nome,
             cognome: data.cognome,
             data_nascita: data.data,
             residenza: data.residenza,
-            imgUtente: "img/linkToDirectory",
-            numero_in_gara_preferito: 0,
-            id_numero_circuito_preferito: 0,
-            id_numero_circuito_odiato: 0,
-            id_auto_preferita: 0,
+            //imgUtente: "img/linkToDirectory",
+            numero_in_gara_preferito: data.numero_preferito_gara,
+            id_numero_circuito_preferito: circuitoPrefPicked.id,
+            id_numero_circuito_odiato: circuitoOdiatoPicked.id,
+            id_auto_preferita: vetturaPrefPicked.id,
           },
         ]),
-      })
-        .then((response) => response.json())
-        .then((response) => {
-          console.log(response);
-        });
+      }).then((response) => {
+        if (response.status == "201")
+          showMessage({
+            message: "Modifica avvenuta con successo!",
+            type: "success",
+          });
+        else {
+          showMessage({
+            message: "Qualcosa è andato storto, riprova!",
+            type: "danger",
+          });
+        }
+      });
     } catch (error) {
       console.log(error);
     }
@@ -89,32 +170,19 @@ const InfoUtente = () => {
   function cleanUpDatePickerState() {
     return setDatePickerState({ visibility: false, dateDisplay: "" });
   }
-
+  function changeVisibility(state) {
+    setIsVisible({
+      ...state,
+    });
+  }
   return (
     <SafeAreaView
-      style={{ backgroundColor: "rgba(51, 102, 255,0.5)", flex: 1 }}
+      style={{
+        backgroundColor: "rgba(51, 102, 255,0.5)",
+      }}
     >
-      <ScrollView pagingEnabled={true} scrollEventThrottle={16}>
+      <ScrollView>
         <View style={styles.regform}>
-          <Controller
-            control={control}
-            render={({ onChange, onBlur, value }) => (
-              <TextInput
-                style={styles.textinput}
-                onBlur={onBlur}
-                onChangeText={(value) => onChange(value)}
-                value={value}
-                placeholder="Inserisci il tuo username"
-                underlineColorAndroid={"transparent"}
-              />
-            )}
-            name="username"
-            rules={{ required: true }}
-            defaultValue=""
-          />
-          {errors.username && (
-            <Text style={styles.errorText}>Campo richiesto</Text>
-          )}
           <Controller
             control={control}
             render={({ onChange, onBlur, value }) => (
@@ -125,6 +193,7 @@ const InfoUtente = () => {
                 value={value}
                 placeholder="Inserisci la tua email"
                 underlineColorAndroid={"transparent"}
+                keyboardType="email-address"
               />
             )}
             name="email"
@@ -151,6 +220,7 @@ const InfoUtente = () => {
                 placeholder="Inserisci la tua password"
                 underlineColorAndroid={"transparent"}
                 secureTextEntry={true}
+                keyboardType="default"
               />
             )}
             name="password"
@@ -166,115 +236,239 @@ const InfoUtente = () => {
           {errors.password && (
             <Text style={styles.errorText}>{errors.password.message}</Text>
           )}
-        </View>
-        <Controller
-          control={control}
-          render={({ onChange, onBlur, value }) => (
-            <TextInput
-              style={styles.textinput}
-              onBlur={onBlur}
-              onChangeText={(value) => onChange(value)}
-              value={value}
-              placeholder="Inserisci il tuo nome"
-              underlineColorAndroid={"transparent"}
-            />
-          )}
-          name="nome"
-          rules={{
-            required: { value: true, message: "Campo richiesto" },
-            validate: (value) =>
-              value.match(/[0-9!/"£$%&()=?^@#§*]/) == null ||
-              "Numeri e caratteri speciali non ammessi",
-          }}
-          defaultValue=""
-        />
-        {errors.nome && (
-          <Text style={styles.errorText}>{errors.nome.message}</Text>
-        )}
-        <Controller
-          control={control}
-          render={({ onChange, onBlur, value }) => (
-            <TextInput
-              style={styles.textinput}
-              onBlur={onBlur}
-              onChangeText={(value) => onChange(value)}
-              value={value}
-              style={styles.textinput}
-              placeholder="Inserisci il tuo cognome"
-              underlineColorAndroid={"transparent"}
-            />
-          )}
-          name="cognome"
-          rules={{
-            required: { value: true, message: "Campo richiesto" },
-            validate: (value) =>
-              value.match(/[0-9!/"£$%&()=?^@#§*]/) == null ||
-              "Numeri e caratteri speciali non ammessi",
-          }}
-          defaultValue=""
-        />
-        {errors.cognome && (
-          <Text style={styles.errorText}>{errors.cognome.message}</Text>
-        )}
-        <Controller
-          control={control}
-          render={({ onChange, onBlur, dateDisplay }) => (
-            <TouchableOpacity onPress={() => onPresstextInput()}>
+          <Controller
+            control={control}
+            render={({ onChange, onBlur, value }) => (
               <TextInput
                 style={styles.textinput}
-                placeholder="GG/MM/YYYY"
-                underlineColorAndroid={"transparent"}
-                editable={false}
-                value={datePickerState.dateDisplay}
                 onBlur={onBlur}
-                onChangeText={(dateDisplay) => onChange(dateDisplay)}
-              ></TextInput>
-            </TouchableOpacity>
-          )}
-          name="data"
-          rules={{
-            required: { value: true, message: "Campo richiesto" },
-          }}
-          defaultValue=""
-        />
-        {errors.data && (
-          <Text style={styles.errorText}>{errors.data.message}</Text>
-        )}
-        <DateTimePickerModal
-          isVisible={datePickerState.visibility}
-          onConfirm={handleConfirm}
-          onCancel={onPressCancel}
-          mode="date"
-          maximumDate={new Date()}
-          locale="it-IT"
-        ></DateTimePickerModal>
-        <Controller
-          control={control}
-          render={({ onChange, onBlur, dateDisplay }) => (
-            <TextInput
-              style={styles.textinput}
-              underlineColorAndroid={"transparent"}
-              onBlur={onBlur}
-              placeholder="Inserisci la tua residenza"
-              onChangeText={(dateDisplay) => onChange(dateDisplay)}
-              underlineColorAndroid={"transparent"}
-            ></TextInput>
-          )}
-          name="residenza"
-          rules={{
-            required: { value: true, message: "Campo richiesto" },
-          }}
-          defaultValue=""
-        />
-        {errors.residenza && (
-          <Text style={styles.errorText}>{errors.residenza.message}</Text>
-        )}
-        <View style={styles.buttonRegistrati}>
-          <Button
-            title={"Salva"}
-            titleStyle={{ fontFamily: "spyagencynorm", fontSize: 16 }}
-            onPress={handleSubmit(onSubmit)}
+                onChangeText={(value) => onChange(value)}
+                value={value}
+                placeholder="Inserisci il tuo nome"
+                underlineColorAndroid={"transparent"}
+              />
+            )}
+            name="nome"
+            rules={{
+              required: { value: true, message: "Campo richiesto" },
+              validate: (value) =>
+                value.match(/[0-9!/"£$%&()=?^@#§*]/) == null ||
+                "Numeri e caratteri speciali non ammessi",
+            }}
+            defaultValue=""
           />
+          {errors.nome && (
+            <Text style={styles.errorText}>{errors.nome.message}</Text>
+          )}
+          <Controller
+            control={control}
+            render={({ onChange, onBlur, value }) => (
+              <TextInput
+                style={styles.textinput}
+                onBlur={onBlur}
+                onChangeText={(value) => onChange(value)}
+                value={value}
+                style={styles.textinput}
+                placeholder="Inserisci il tuo cognome"
+                underlineColorAndroid={"transparent"}
+              />
+            )}
+            name="cognome"
+            rules={{
+              required: { value: true, message: "Campo richiesto" },
+              validate: (value) =>
+                value.match(/[0-9!/"£$%&()=?^@#§*]/) == null ||
+                "Numeri e caratteri speciali non ammessi",
+            }}
+            defaultValue=""
+          />
+          {errors.cognome && (
+            <Text style={styles.errorText}>{errors.cognome.message}</Text>
+          )}
+          <Controller
+            control={control}
+            render={({ onChange, onBlur, dateDisplay }) => (
+              <TouchableOpacity onPress={() => onPresstextInput()}>
+                <TextInput
+                  style={styles.textinput}
+                  placeholder="GG/MM/YYYY"
+                  underlineColorAndroid={"transparent"}
+                  editable={false}
+                  value={datePickerState.dateDisplay}
+                  onBlur={onBlur}
+                  onChangeText={(dateDisplay) => onChange(dateDisplay)}
+                ></TextInput>
+              </TouchableOpacity>
+            )}
+            name="data"
+            rules={{
+              required: { value: true, message: "Campo richiesto" },
+            }}
+            defaultValue=""
+          />
+          {errors.data && (
+            <Text style={styles.errorText}>{errors.data.message}</Text>
+          )}
+          <DateTimePickerModal
+            isVisible={datePickerState.visibility}
+            onConfirm={handleConfirm}
+            onCancel={onPressCancel}
+            mode="date"
+            maximumDate={new Date()}
+            locale="it-IT"
+          ></DateTimePickerModal>
+          <Controller
+            control={control}
+            render={({ onChange, onBlur, value }) => (
+              <TextInput
+                style={styles.textinput}
+                onBlur={onBlur}
+                onChangeText={(value) => onChange(value)}
+                value={value}
+                placeholder="Inserisci la tua residenza"
+                underlineColorAndroid={"transparent"}
+              />
+            )}
+            name="residenza"
+            rules={{ required: { value: true, message: "Campo richiesto" } }}
+            defaultValue=""
+          />
+          {errors.residenza && (
+            <Text style={styles.errorText}>{errors.residenza.message}</Text>
+          )}
+          <Controller
+            control={control}
+            render={({ onChange, onBlur, value }) => (
+              <TextInput
+                style={styles.textinput}
+                onBlur={onBlur}
+                onChangeText={(value) => onChange(value)}
+                value={value}
+                placeholder="Numero preferito in gara"
+                underlineColorAndroid={"transparent"}
+                keyboardType="number-pad"
+              />
+            )}
+            name="numero_preferito_gara"
+            rules={{ required: { value: true, message: "Campo richiesto" } }}
+            defaultValue=""
+          />
+          {errors.numero_preferito_gara && (
+            <Text style={styles.errorText}>
+              {errors.numero_preferito_gara.message}
+            </Text>
+          )}
+          {listaVetture.length != 0 ? (
+            <DropDownPicker
+              items={listaVetture}
+              defaultValue={utente.id_auto_preferita}
+              isVisible={isVisible.dropAuto}
+              onOpen={() => {
+                changeVisibility({
+                  dropAuto: true,
+                  dropCircuiti: false,
+                  dropCircuitiOdiati: false,
+                });
+              }}
+              onClose={() => {
+                changeVisibility({
+                  dropAuto: false,
+                  dropCircuiti: false,
+                  dropCircuitiOdiati: false,
+                });
+              }}
+              itemStyle={{ justifyContent: "flex-start" }}
+              placeholder="Seleziona la tua auto preferita"
+              placeholderStyle={{ justifyContent: "flex-start" }}
+              dropDownMaxHeight={100}
+              containerStyle={{
+                width: width / 1.5,
+                marginBottom: "8%",
+                marginTop: "8%",
+              }}
+              style={{ width: width / 1.5 }}
+              onChangeItem={(item) => {
+                console.log(item);
+                setVetturaPrefPicked(item);
+              }}
+            />
+          ) : (
+            <AppLoading />
+          )}
+          {listaCircuiti.length != 0 ? (
+            <DropDownPicker
+              items={listaCircuiti}
+              defaultValue={utente.id_numero_circuito_preferito}
+              isVisible={isVisible.dropCircuiti}
+              onOpen={() =>
+                changeVisibility({
+                  dropAuto: false,
+                  dropCircuiti: true,
+                  dropCircuitiOdiati: false,
+                })
+              }
+              onClose={() =>
+                changeVisibility({
+                  dropAuto: false,
+                  dropCircuiti: false,
+                  dropCircuitiOdiati: false,
+                })
+              }
+              itemStyle={{ justifyContent: "flex-start" }}
+              placeholder="Seleziona il tuo circuito preferito"
+              placeholderStyle={{ justifyContent: "flex-start" }}
+              containerStyle={{ width: width / 1.5, marginBottom: "8%" }}
+              dropDownMaxHeight={100}
+              style={{ width: width / 1.5 }}
+              onChangeItem={(item) => {
+                console.log(item);
+                setCircuitoPrefPicked(item);
+              }}
+            />
+          ) : (
+            <AppLoading />
+          )}
+          {listaCircuiti.length != 0 ? (
+            <DropDownPicker
+              items={listaCircuiti}
+              defaultValue={utente.id_numero_circuito_odiato}
+              onOpen={() =>
+                changeVisibility({
+                  dropAuto: false,
+                  dropCircuiti: false,
+                  dropCircuitiOdiati: true,
+                })
+              }
+              onClose={() =>
+                changeVisibility({
+                  dropAuto: false,
+                  dropCircuiti: false,
+                  dropCircuitiOdiati: false,
+                })
+              }
+              isVisible={isVisible.dropCircuitiOdiati}
+              itemStyle={{ justifyContent: "flex-start" }}
+              placeholder="Seleziona il tuo circuito odiato"
+              placeholderStyle={{ justifyContent: "flex-start" }}
+              containerStyle={{ width: width / 1.5, marginBottom: "8%" }}
+              dropDownMaxHeight={100}
+              style={{ width: width / 1.5 }}
+              onChangeItem={(item) => {
+                console.log(item);
+                setCircuitoOdiatoPicked(item);
+              }}
+            />
+          ) : (
+            <AppLoading />
+          )}
+
+          <View style={styles.buttonRegistrati}>
+            <Button
+              title={"Salva"}
+              titleStyle={{ fontFamily: "spyagencynorm", fontSize: 16 }}
+              onPress={handleSubmit(onSubmit)}
+            />
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -432,7 +626,7 @@ const styles = StyleSheet.create({
   textinput: {
     alignSelf: "center",
     height: 40,
-    width: width / 2,
+    width: width / 1.5,
     marginBottom: 12,
     borderBottomWidth: 1,
     borderBottomColor: "lightblue",
@@ -441,12 +635,16 @@ const styles = StyleSheet.create({
   buttonRegistrati: {
     width: width / 3,
     alignSelf: "center",
-    marginTop: 18,
+    marginTop: "15%",
+    marginBottom: "5%",
   },
   regform: {
     width: width,
     marginTop: "5%",
     alignSelf: "stretch",
     alignItems: "center",
+  },
+  errorText: {
+    color: "red",
   },
 });

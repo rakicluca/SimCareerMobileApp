@@ -31,7 +31,7 @@ import Dots from "react-native-dots-pagination";
 let screenWidth = Dimensions.get("window").width;
 let screenHight = Dimensions.get("window").height;
 
-export default function RegForm() {
+export default function RegForm({ navigation }) {
   //Load custom font
   const [isLoaded] = useFonts({
     spyagencygrad: require("../../assets/fonts/SpyAgency/spyagency3grad.ttf"),
@@ -101,11 +101,14 @@ export default function RegForm() {
             id_auto_preferita: 0,
           },
         ]),
-      })
-        .then((response) => response.json())
-        .then((response) => {
-          console.log(response);
-        });
+      }).then((response) => {
+        if (response.status == "200") {
+          console.log("dentro");
+          //navigation.push("Login");
+        } else {
+          console.log(response.status);
+        }
+      });
     } catch (error) {
       console.log(error);
     }
