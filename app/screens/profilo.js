@@ -13,6 +13,7 @@ import {
   Platform,
   Keyboard,
   SafeAreaView,
+  TouchableOpacityComponent,
 } from "react-native";
 import InfoGara from "./info_Gara";
 import ClassificaGara from "./classifiche_Gare";
@@ -24,6 +25,7 @@ import config from "../config/config";
 import DropDownPicker from "react-native-dropdown-picker";
 import { AppLoading } from "expo";
 import { showMessage } from "react-native-flash-message";
+import * as ImagePicker from "expo-image-picker";
 
 let width = Dimensions.get("screen").width;
 let height = Dimensions.get("screen").height;
@@ -128,7 +130,7 @@ const InfoUtente = () => {
             cognome: data.cognome,
             data_nascita: data.data,
             residenza: data.residenza,
-            //imgUtente: "img/linkToDirectory",
+            imgUtente: selectedImage.base64,
             numero_in_gara_preferito: data.numero_preferito_gara,
             id_numero_circuito_preferito: circuitoPrefPicked.id,
             id_numero_circuito_odiato: circuitoOdiatoPicked.id,
@@ -183,6 +185,7 @@ const InfoUtente = () => {
     >
       <ScrollView>
         <View style={styles.regform}>
+          <Text style={styles.infoUtenteText}>Email</Text>
           <Controller
             control={control}
             render={({ onChange, onBlur, value }) => (
@@ -209,6 +212,7 @@ const InfoUtente = () => {
           {errors.email && (
             <Text style={styles.errorText}>{errors.email.message}</Text>
           )}
+          <Text style={styles.infoUtenteText}>Password</Text>
           <Controller
             control={control}
             render={({ onChange, onBlur, value }) => (
@@ -236,6 +240,7 @@ const InfoUtente = () => {
           {errors.password && (
             <Text style={styles.errorText}>{errors.password.message}</Text>
           )}
+          <Text style={styles.infoUtenteText}>Nome</Text>
           <Controller
             control={control}
             render={({ onChange, onBlur, value }) => (
@@ -260,6 +265,7 @@ const InfoUtente = () => {
           {errors.nome && (
             <Text style={styles.errorText}>{errors.nome.message}</Text>
           )}
+          <Text style={styles.infoUtenteText}>Cognome</Text>
           <Controller
             control={control}
             render={({ onChange, onBlur, value }) => (
@@ -285,6 +291,7 @@ const InfoUtente = () => {
           {errors.cognome && (
             <Text style={styles.errorText}>{errors.cognome.message}</Text>
           )}
+          <Text style={styles.infoUtenteText}>Data di nascita</Text>
           <Controller
             control={control}
             render={({ onChange, onBlur, dateDisplay }) => (
@@ -317,6 +324,7 @@ const InfoUtente = () => {
             maximumDate={new Date()}
             locale="it-IT"
           ></DateTimePickerModal>
+          <Text style={styles.infoUtenteText}>Indirizzo di residenza</Text>
           <Controller
             control={control}
             render={({ onChange, onBlur, value }) => (
@@ -336,11 +344,15 @@ const InfoUtente = () => {
           {errors.residenza && (
             <Text style={styles.errorText}>{errors.residenza.message}</Text>
           )}
+          <Text style={styles.infoUtenteText}>Numero preferito in gara</Text>
           <Controller
             control={control}
             render={({ onChange, onBlur, value }) => (
               <TextInput
-                style={styles.textinput}
+                style={[
+                  styles.textinput,
+                  { textAlign: "center", width: width / 4, marginBottom: "5%" },
+                ]}
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
                 value={value}
@@ -358,6 +370,7 @@ const InfoUtente = () => {
               {errors.numero_preferito_gara.message}
             </Text>
           )}
+          <Text style={styles.infoUtenteText}>Vettura preferita</Text>
           {listaVetture.length != 0 ? (
             <DropDownPicker
               items={listaVetture}
@@ -383,8 +396,8 @@ const InfoUtente = () => {
               dropDownMaxHeight={100}
               containerStyle={{
                 width: width / 1.5,
-                marginBottom: "8%",
-                marginTop: "8%",
+                marginBottom: "7%",
+                marginTop: "1%",
               }}
               style={{ width: width / 1.5 }}
               onChangeItem={(item) => {
@@ -395,6 +408,7 @@ const InfoUtente = () => {
           ) : (
             <AppLoading />
           )}
+          <Text style={styles.infoUtenteText}>Circuito preferito</Text>
           {listaCircuiti.length != 0 ? (
             <DropDownPicker
               items={listaCircuiti}
@@ -417,7 +431,11 @@ const InfoUtente = () => {
               itemStyle={{ justifyContent: "flex-start" }}
               placeholder="Seleziona il tuo circuito preferito"
               placeholderStyle={{ justifyContent: "flex-start" }}
-              containerStyle={{ width: width / 1.5, marginBottom: "8%" }}
+              containerStyle={{
+                width: width / 1.5,
+                marginBottom: "7%",
+                marginTop: "1%",
+              }}
               dropDownMaxHeight={100}
               style={{ width: width / 1.5 }}
               onChangeItem={(item) => {
@@ -428,6 +446,7 @@ const InfoUtente = () => {
           ) : (
             <AppLoading />
           )}
+          <Text style={styles.infoUtenteText}>Circuito odiato</Text>
           {listaCircuiti.length != 0 ? (
             <DropDownPicker
               items={listaCircuiti}
@@ -447,12 +466,18 @@ const InfoUtente = () => {
                 })
               }
               isVisible={isVisible.dropCircuitiOdiati}
-              itemStyle={{ justifyContent: "flex-start" }}
+              itemStyle={{ justifyContent: "center" }}
               placeholder="Seleziona il tuo circuito odiato"
               placeholderStyle={{ justifyContent: "flex-start" }}
-              containerStyle={{ width: width / 1.5, marginBottom: "8%" }}
+              containerStyle={{
+                width: width / 1.5,
+                marginBottom: "8%",
+                marginTop: "1%",
+              }}
               dropDownMaxHeight={100}
-              style={{ width: width / 1.5 }}
+              style={{
+                width: width / 1.5,
+              }}
               onChangeItem={(item) => {
                 console.log(item);
                 setCircuitoOdiatoPicked(item);
@@ -531,6 +556,39 @@ const ProfileTabNavScreen = () => (
 
 export default function Profile() {
   let utente = syncStorage.get("utente");
+  //Set image picker
+  const pathToDefaultImage = "../../assets/img/user.png";
+  const [selectedImage, setSelectedImage] = React.useState(
+    Image.resolveAssetSource(require(pathToDefaultImage)).uri
+  );
+  let openImagePickerAsync = async () => {
+    let permissionResultRoll = await ImagePicker.requestCameraRollPermissionsAsync();
+    let permissionResultCamera = await ImagePicker.requestCameraPermissionsAsync();
+
+    if (
+      permissionResultRoll.granted === false ||
+      permissionResultCamera.granted === false
+    ) {
+      alert("Permission to access camera roll and camera is required!");
+      return;
+    }
+
+    let pickerResult = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+    });
+    if (pickerResult.cancelled === true) {
+      return;
+    }
+
+    setSelectedImage(pickerResult.uri);
+
+    //Clean Up
+    return () => {
+      setSelectedImage(
+        Image.resolveAssetSource(require(pathToDefaultImage)).uri
+      );
+    };
+  };
   return (
     <View style={{ flex: 1, backgroundColor: "rgba(51, 102, 255, 0.6)" }}>
       <View
@@ -549,17 +607,19 @@ export default function Profile() {
             borderRadius: 170,
           }}
         >
-          <Image
-            style={{
-              width: 180,
-              height: 180,
-              borderRadius: 190 / 2,
-              resizeMode: "contain",
-            }}
-            source={{
-              uri: utente.imgUtente,
-            }}
-          ></Image>
+          <TouchableOpacity onPress={openImagePickerAsync}>
+            <Image
+              style={{
+                width: 180,
+                height: 180,
+                borderRadius: 190 / 2,
+                resizeMode: "contain",
+              }}
+              source={{
+                uri: utente.imgUtente,
+              }}
+            />
+          </TouchableOpacity>
         </View>
         <View
           style={{
@@ -641,10 +701,15 @@ const styles = StyleSheet.create({
   regform: {
     width: width,
     marginTop: "5%",
-    alignSelf: "stretch",
     alignItems: "center",
   },
   errorText: {
     color: "red",
+  },
+  infoUtenteText: {
+    color: "white",
+    fontFamily: "spyagencygrad",
+    marginTop: "3%",
+    fontSize: 17,
   },
 });
