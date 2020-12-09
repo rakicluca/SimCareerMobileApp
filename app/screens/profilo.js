@@ -557,10 +557,10 @@ const ProfileTabNavScreen = () => (
 export default function Profile() {
   let utente = syncStorage.get("utente");
   //Set image picker
-  const pathToDefaultImage = "../../assets/img/user.png";
-  const [selectedImage, setSelectedImage] = React.useState(
-    Image.resolveAssetSource(require(pathToDefaultImage)).uri
-  );
+  const [selectedImage, setSelectedImage] = React.useState({
+    uri: utente.imgUtente,
+    base64: "",
+  });
   let openImagePickerAsync = async () => {
     let permissionResultRoll = await ImagePicker.requestCameraRollPermissionsAsync();
     let permissionResultCamera = await ImagePicker.requestCameraPermissionsAsync();
@@ -575,18 +575,21 @@ export default function Profile() {
 
     let pickerResult = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
+      base64: true,
     });
     if (pickerResult.cancelled === true) {
       return;
     }
-
-    setSelectedImage(pickerResult.uri);
-
+    setSelectedImage({
+      uri: pickerResult.uri,
+      base64: pickerResult.base64,
+    });
     //Clean Up
     return () => {
-      setSelectedImage(
-        Image.resolveAssetSource(require(pathToDefaultImage)).uri
-      );
+      setSelectedImage({
+        uri: utente.imgUtente,
+        base64: "",
+      });
     };
   };
   return (
@@ -613,10 +616,10 @@ export default function Profile() {
                 width: 180,
                 height: 180,
                 borderRadius: 190 / 2,
-                resizeMode: "contain",
+                resizeMode: "cover",
               }}
               source={{
-                uri: utente.imgUtente,
+                uri: selectedImage.uri,
               }}
             />
           </TouchableOpacity>

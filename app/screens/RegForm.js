@@ -46,7 +46,6 @@ export default function RegForm({ navigation }) {
   let openImagePickerAsync = async () => {
     let permissionResultRoll = await ImagePicker.requestCameraRollPermissionsAsync();
     let permissionResultCamera = await ImagePicker.requestCameraPermissionsAsync();
-
     if (
       permissionResultRoll.granted === false ||
       permissionResultCamera.granted === false
@@ -54,7 +53,6 @@ export default function RegForm({ navigation }) {
       alert("Permission to access camera roll and camera is required!");
       return;
     }
-
     let pickerResult = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
       base64: true,
@@ -62,7 +60,6 @@ export default function RegForm({ navigation }) {
     if (pickerResult.cancelled === true) {
       return;
     }
-
     setSelectedImage({ uri: pickerResult.uri, base64: pickerResult.base64 });
     //Clean Up
     return () => {
@@ -445,7 +442,7 @@ const styles = StyleSheet.create({
     height: 139,
     borderRadius: 139 / 2,
     alignSelf: "center",
-    resizeMode: "contain",
+    resizeMode: "cover",
     marginTop: screenHight * 0.06,
   },
 });
