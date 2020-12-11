@@ -14,13 +14,14 @@ import {
   Keyboard,
   SafeAreaView,
   TouchableOpacityComponent,
+  Switch,
 } from "react-native";
 import InfoGara from "./info_Gara";
 import ClassificaGara from "./classifiche_Gare";
 import syncStorage from "sync-storage";
 import { Controller, useForm } from "react-hook-form";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import { Button } from "react-native-elements";
+import { Button, Icon } from "react-native-elements";
 import config from "../config/config";
 import DropDownPicker from "react-native-dropdown-picker";
 import { AppLoading } from "expo";
@@ -74,6 +75,7 @@ async function getListaCircuiti(setListaCircuiti) {
 
 const InfoUtente = () => {
   let utente = syncStorage.get("utente");
+  let utenteFingerprint = syncStorage.get("utenteFingerprint");
   const { control, errors, handleSubmit, getValues, setValue } = useForm({
     defaultValues: {
       username: utente.username,
@@ -106,6 +108,10 @@ const InfoUtente = () => {
   const [circuitoOdiatoPicked, setCircuitoOdiatoPicked] = React.useState(
     utente.id_numero_circuito_odiato
   );
+  const [isEnabled, setIsEnabled] = React.useState(
+    utenteFingerprint != undefined ? !utenteFingerprint.enabled : false
+  );
+  const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
 
   React.useEffect(() => {
     getListaVetture(setListaVetture);
@@ -487,6 +493,32 @@ const InfoUtente = () => {
             <AppLoading />
           )}
 
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Text style={styles.infoUtenteImpronta}>
+              Login con impronta digitale
+            </Text>
+            <Switch
+              trackColor={{ false: "#767577", true: "#767577" }}
+              thumbColor={isEnabled ? "#02e609" : "#ff4026"}
+              ios_backgroundColor="#3e3e3e"
+              onValueChange={() => {
+                toggleSwitch();
+                if (!isEnabled) {
+                  utenteFingerprint = utente;
+                  utenteFingerprint.enabled = isEnabled;
+                  syncStorage.set("utenteFingerprint", utenteFingerprint);
+                } else syncStorage.remove("utenteFingerprint");
+              }}
+              value={isEnabled}
+            ></Switch>
+          </View>
+
           <View style={styles.buttonRegistrati}>
             <Button
               title={"Salva"}
@@ -535,7 +567,7 @@ const ProfileTabNavScreen = () => (
     backBehavior={"order"}
   >
     <ProfileTabNav.Screen
-      name="Info"
+      name="Info Ed Impostazioni"
       component={InfoUtente}
       /*       initialParams={{
         idCampionato: getData("idCampionato"),
@@ -714,5 +746,10 @@ const styles = StyleSheet.create({
     fontFamily: "spyagencygrad",
     marginTop: "3%",
     fontSize: 17,
+  },
+  infoUtenteImpronta: {
+    color: "white",
+    fontFamily: "spyagencygrad",
+    fontSize: 15,
   },
 });

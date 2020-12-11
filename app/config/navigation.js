@@ -92,6 +92,6 @@ const AppTabsScreen = () => (
 export default ({ route }) => (
   <NavigationContainer>
     <LoginStackScreen />
-    <FlashMessage position="top"></FlashMessage>
+    <FlashMessage position="top" />
   </NavigationContainer>
 );

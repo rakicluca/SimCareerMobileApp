@@ -38,11 +38,17 @@ function getMeteo(calendario, idGara) {
       </View>
       <View style={styles.garaText}>
         <Text style={styles.testo}>Temperatura min: </Text>
-        <Text style={styles.testoValore}>{meteo[0].temp.min}</Text>
+        <Text style={styles.testoValore}>
+          {meteo[0].temp.min}
+          {"°C"}
+        </Text>
       </View>
       <View style={styles.garaText}>
         <Text style={styles.testo}>Temperatura max: </Text>
-        <Text style={styles.testoValore}>{meteo[0].temp.max}</Text>
+        <Text style={styles.testoValore}>
+          {meteo[0].temp.max}
+          {"°C"}
+        </Text>
       </View>
       <View style={styles.garaText}>
         <Text style={styles.testo}>Umidità: </Text>
@@ -53,13 +59,16 @@ function getMeteo(calendario, idGara) {
       </View>
       <View style={styles.garaText}>
         <Text style={styles.testo}>Velocità del vento: </Text>
-        <Text style={styles.testoValore}>{meteo[0].wind_speed}</Text>
+        <Text style={styles.testoValore}>
+          {meteo[0].wind_speed}
+          {" m/s"}
+        </Text>
       </View>
       <View style={styles.garaText}>
         <Text style={styles.testo}>Pioggia: </Text>
         <Text style={styles.testoValore}>
-          {meteo[0].rain}
-          {"mm"}
+          {meteo[0].rain == undefined ? 0 : meteo[0].rain}
+          {" mm"}
         </Text>
       </View>
     </>

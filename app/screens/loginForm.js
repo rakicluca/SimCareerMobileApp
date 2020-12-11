@@ -23,6 +23,8 @@ import config from "../config/config";
 import syncStorage from "sync-storage";
 import * as Permissions from "expo-permissions";
 import * as Notifications from "expo-notifications";
+import * as LocalAuthentication from "expo-local-authentication";
+import { showMessage } from "react-native-flash-message";
 
 let screenWidth = Dimensions.get("window").width;
 let screenHight = Dimensions.get("window").height;
@@ -64,72 +66,159 @@ export default function LoginForm({ navigation }) {
     setValue,
     reset,
   } = useForm();
+  const utenteFingerprint = syncStorage.get("utenteFingerprint");
   const [loginSuccess, setLoginSuccess] = React.useState(false);
   const [rememberMeCheck, setRememberMeCheck] = React.useState(false);
+  //Checkbox Settings
+  const [toggleCheckBox, setToggleCheckBox] = React.useState(false);
+
+  async function rememberMeOnLoad() {
+    const login = await getRememberedUser();
+    if (login != undefined) {
+      reset({ username: login.username, password: login.password });
+      setToggleCheckBox(true);
+    }
+  }
+  const handleAuthentication = async () => {
+    let result = await LocalAuthentication.authenticateAsync();
+    if (result.success) {
+      onSubmit();
+    }
+  };
   React.useEffect(() => {
-    async function rememberMeOnLoad() {
-      const login = await getRememberedUser();
-      if (login != undefined) {
-        reset({ username: login.username, password: login.password });
-        setToggleCheckBox(true);
+    rememberMeOnLoad();
+    //Fingerprint check for device compatibility
+    async function checkDeviceForHardware() {
+      let compatible = await LocalAuthentication.hasHardwareAsync();
+      if (compatible) {
+        console.log("Compatible Device!");
+      } else {
+        console.log("Current device does not have the necessary hardware!");
+        showMessage({
+          message:
+            "Il tuo dispositivo non dispone del lettore d'impronte digitali",
+          type: "warning",
+        });
       }
     }
-    rememberMeOnLoad();
+    //Fingerprint check for user fingerprint records
+    const checkForBiometrics = async () => {
+      let biometricRecords = await LocalAuthentication.isEnrolledAsync();
+      if (!biometricRecords) {
+        console.log("No Biometrics Found");
+        showMessage({
+          message:
+            "Non sono state trovate impronte digitali registrate nel tuo dispositivo, vai nelle impostazioni del tuo dispositivo ed aggiungile",
+          type: "warning",
+          duration: 2500,
+        });
+      } else {
+        console.log("Biometrics Found");
+      }
+    };
+    checkDeviceForHardware();
+    checkForBiometrics();
   }, []);
+  React.useEffect(() => {
+    if (utenteFingerprint != undefined) {
+      handleAuthentication();
+    }
+  }, [utenteFingerprint]);
 
-  const onSubmit = (data) => {
+  const onSubmit = () => {
     global.username = getValues("username");
     if (toggleCheckBox) {
       setRememberMe(getValues("username"), getValues("password"));
     } else {
       removeRememberMe();
     }
-    fetch(
-      config.url.path +
-        "/utenti/" +
-        getValues("username") +
-        "/" +
-        getValues("password"),
-      {
-        method: "GET",
-        dataType: "json",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      }
-    )
-      .then((response) => {
-        if (response.status === 200) {
-          setLoginSuccess(false);
-          return response.json();
-        } else {
-          setLoginSuccess(true);
+    if (utenteFingerprint != undefined) {
+      console.log(utenteFingerprint);
+      fetch(
+        config.url.path +
+          "/utenti/" +
+          utenteFingerprint.username +
+          "/" +
+          utenteFingerprint.password,
+        {
+          method: "GET",
+          dataType: "json",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
         }
-      })
-      .then((response) => {
-        if (response) {
-          syncStorage.set("utente", response);
-          registerForPushNotifications(response);
-          navigation.dispatch(
-            CommonActions.reset({
-              index: 0,
-              routes: [{ name: "AppTabs" }],
-            })
-          );
+      )
+        .then((response) => {
+          if (response.status === 200) {
+            setLoginSuccess(false);
+            return response.json();
+          } else {
+            setLoginSuccess(true);
+          }
+        })
+        .then((response) => {
+          if (response) {
+            syncStorage.set("utente", response);
+            registerForPushNotifications(response);
+            navigation.dispatch(
+              CommonActions.reset({
+                index: 0,
+                routes: [{ name: "AppTabs" }],
+              })
+            );
+          }
+        })
+        .catch((er) => {
+          console.log(er);
+        });
+    } else {
+      console.log("dentro");
+      fetch(
+        config.url.path +
+          "/utenti/" +
+          getValues("username") +
+          "/" +
+          getValues("password"),
+        {
+          method: "GET",
+          dataType: "json",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
         }
-      })
-      .catch((er) => {
-        console.log(er);
-      });
+      )
+        .then((response) => {
+          if (response.status === 200) {
+            setLoginSuccess(false);
+            return response.json();
+          } else {
+            setLoginSuccess(true);
+          }
+        })
+        .then((response) => {
+          if (response) {
+            syncStorage.set("utente", response);
+            registerForPushNotifications(response);
+            navigation.dispatch(
+              CommonActions.reset({
+                index: 0,
+                routes: [{ name: "AppTabs" }],
+              })
+            );
+          }
+        })
+        .catch((er) => {
+          console.log(er);
+        });
+    }
   };
   //Load custom font
   const [isLoaded] = useFonts({
     spyagencygrad: require("../../assets/fonts/SpyAgency/spyagency3grad.ttf"),
     spyagencynorm: require("../../assets/fonts/SpyAgency/spyagency3.ttf"),
   });
-  //Checkbox Settings
-  const [toggleCheckBox, setToggleCheckBox] = React.useState(false);
 
   const [isVisible, setIsVisible] = React.useState(false);
   const [email_for_reset, setEmail_for_reset] = React.useState("");
@@ -292,6 +381,23 @@ export default function LoginForm({ navigation }) {
             </Modal>
           </View>
         </ScrollView>
+        <View style={styles.fingerprint}>
+          <Button
+            title="Accedi con riconoscimento biometrico"
+            buttonStyle={{ backgroundColor: "transparent" }}
+            titleStyle={{ fontFamily: "spyagencynorm", fontSize: 13 }}
+            onPress={() => {
+              if (utenteFingerprint != undefined) handleAuthentication();
+              else
+                showMessage({
+                  message:
+                    "Per usare questa funzione fare l'accesso ed abilitarla nelle impostazioni del proprio account",
+                  type: "info",
+                  duration: 3200,
+                });
+            }}
+          />
+        </View>
       </View>
     );
   }
@@ -395,6 +501,10 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#00BCD4",
   },
+  fingerprint: {
+    flex: 1,
+    justifyContent: "flex-end",
+  },
 });
 
 async function setRememberMe(username, password) {
@@ -423,12 +533,13 @@ async function getRememberedUser() {
     }
   } catch (error) {
     // Error retrieving data
+    console.error(errror);
   }
 }
 
 async function sendEmailForResetPassword(email) {
   console.log(email);
-  return await fetch("http://192.168.1.7:3000/utenti/reset", {
+  return await fetch(config.url.path + "/utenti/reset", {
     method: "POST",
     dataType: "json",
     headers: {
