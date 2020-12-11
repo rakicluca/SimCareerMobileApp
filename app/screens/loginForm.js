@@ -66,12 +66,13 @@ export default function LoginForm({ navigation }) {
     setValue,
     reset,
   } = useForm();
-  const utenteFingerprint = syncStorage.get("utenteFingerprint");
   const [loginSuccess, setLoginSuccess] = React.useState(false);
   const [rememberMeCheck, setRememberMeCheck] = React.useState(false);
+
   //Checkbox Settings
   const [toggleCheckBox, setToggleCheckBox] = React.useState(false);
-
+  //const [utenteFingerprint, setUtenteFingerprint] = React.useState();
+  let utenteFingerprint;
   async function rememberMeOnLoad() {
     const login = await getRememberedUser();
     if (login != undefined) {
@@ -118,12 +119,17 @@ export default function LoginForm({ navigation }) {
     };
     checkDeviceForHardware();
     checkForBiometrics();
+    getUser("utenteFingerprint")
+      .then((response) => {
+        return response;
+      })
+      .then((res) => {
+        utenteFingerprint = JSON.parse(res);
+        if (utenteFingerprint != undefined) {
+          handleAuthentication();
+        }
+      });
   }, []);
-  React.useEffect(() => {
-    if (utenteFingerprint != undefined) {
-      handleAuthentication();
-    }
-  }, [utenteFingerprint]);
 
   const onSubmit = () => {
     global.username = getValues("username");
@@ -133,7 +139,6 @@ export default function LoginForm({ navigation }) {
       removeRememberMe();
     }
     if (utenteFingerprint != undefined) {
-      console.log(utenteFingerprint);
       fetch(
         config.url.path +
           "/utenti/" +
@@ -397,14 +402,17 @@ export default function LoginForm({ navigation }) {
             buttonStyle={{ backgroundColor: "transparent" }}
             titleStyle={{ fontFamily: "spyagencynorm", fontSize: 13 }}
             onPress={() => {
-              if (utenteFingerprint != undefined) handleAuthentication();
-              else
-                showMessage({
-                  message:
-                    "Per usare questa funzione fare l'accesso ed abilitarla nelle impostazioni del proprio account",
-                  type: "info",
-                  duration: 3200,
-                });
+              getUser("utenteFingerprint").then((response) => {
+                utenteFingerprint = JSON.parse(response);
+                if (response != undefined) handleAuthentication();
+                else
+                  showMessage({
+                    message:
+                      "Per usare questa funzione fare l'accesso ed abilitarla nelle impostazioni del proprio account",
+                    type: "info",
+                    duration: 3200,
+                  });
+              });
             }}
           />
         </View>
@@ -540,6 +548,18 @@ async function getRememberedUser() {
     if (username !== null) {
       // We have user!!
       return { username: username, password: password };
+    }
+  } catch (error) {
+    // Error retrieving data
+    console.error(errror);
+  }
+}
+async function getUser(field) {
+  try {
+    const utente = await AsyncStorage.getItem(field);
+    if (utente !== null) {
+      // We have user!!
+      return utente;
     }
   } catch (error) {
     // Error retrieving data

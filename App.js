@@ -20,7 +20,7 @@ Notifications.setNotificationHandler({
 
 //this method will be called whenever a notification is received while the app is running.
 Notifications.addNotificationReceivedListener(() => {
-  console.log("CAN SPORCO");
+  console.log("Listener");
 });
 
 export default class App extends React.Component {
