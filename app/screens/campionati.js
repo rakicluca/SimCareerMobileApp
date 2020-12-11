@@ -207,191 +207,183 @@ export default function Campionati({ navigation, route }) {
       if (res.status == "200") setIsSub(true);
     });
   }, []);
-  //Load custom font
-  const [isLoaded] = useFonts({
-    spyagencygrad: require("../../assets/fonts/SpyAgency/spyagency3grad.ttf"),
-    spyagencynorm: require("../../assets/fonts/SpyAgency/spyagency3.ttf"),
-  });
-  if (!isLoaded) {
-    return <AppLoading />;
-  } else {
-    return (
-      <View style={{ flex: 1, backgroundColor: "rgba(51, 102, 255, 0.6)" }}>
-        {/* MODAL FOR SUBSCRIBE TO CHAMP */}
-        <Modal
-          isVisible={isVisible}
-          onBackdropPress={() => {
-            setIsVisible(false);
-          }}
-        >
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>Seleziona</Text>
-            <View style={styles.modalContent}>
-              <View style={styles.modalBody}>
-                <Text style={styles.modalText}>Vettura</Text>
-                <DropDownPicker
-                  items={listaVettureChamp}
-                  itemStyle={{ justifyContent: "flex-start" }}
-                  placeholder="Seleziona una vettura"
-                  placeholderStyle={{ justifyContent: "flex-start" }}
-                  containerStyle={{
-                    height: 40,
-                    width: width / 2.5,
-                    marginLeft: 87,
-                  }}
-                  dropDownMaxHeight={90}
-                  onChangeItem={(item) => {
-                    setPickedVettura(item.label);
-                  }}
-                />
-              </View>
-              <View style={[styles.modalBody, { marginTop: "5%" }]}>
-                <Text style={styles.modalText}>Team</Text>
-                <DropDownPicker
-                  items={listaTeam}
-                  itemStyle={{ justifyContent: "flex-start" }}
-                  placeholder="Seleziona un team"
-                  placeholderStyle={{ justifyContent: "flex-start" }}
-                  containerStyle={{
-                    height: 40,
-                    width: width / 2.5,
-                    marginLeft: 100,
-                  }}
-                  dropDownMaxHeight={90}
-                  onChangeItem={(item) => {
-                    setPickedTeam(item.label);
-                  }}
-                />
-              </View>
+
+  return (
+    <View style={{ flex: 1, backgroundColor: "rgba(51, 102, 255, 0.6)" }}>
+      {/* MODAL FOR SUBSCRIBE TO CHAMP */}
+      <Modal
+        isVisible={isVisible}
+        onBackdropPress={() => {
+          setIsVisible(false);
+        }}
+      >
+        <View style={styles.modalContainer}>
+          <Text style={styles.modalTitle}>Seleziona</Text>
+          <View style={styles.modalContent}>
+            <View style={styles.modalBody}>
+              <Text style={styles.modalText}>Vettura</Text>
+              <DropDownPicker
+                items={listaVettureChamp}
+                itemStyle={{ justifyContent: "flex-start" }}
+                placeholder="Seleziona una vettura"
+                placeholderStyle={{ justifyContent: "flex-start" }}
+                containerStyle={{
+                  height: 40,
+                  width: width / 2.5,
+                  marginLeft: 87,
+                }}
+                dropDownMaxHeight={90}
+                onChangeItem={(item) => {
+                  setPickedVettura(item.label);
+                }}
+              />
             </View>
-            <View style={styles.modalBottom}>
-              <Button
-                title="Invia"
-                buttonStyle={{
-                  width: width / 3,
+            <View style={[styles.modalBody, { marginTop: "5%" }]}>
+              <Text style={styles.modalText}>Team</Text>
+              <DropDownPicker
+                items={listaTeam}
+                itemStyle={{ justifyContent: "flex-start" }}
+                placeholder="Seleziona un team"
+                placeholderStyle={{ justifyContent: "flex-start" }}
+                containerStyle={{
+                  height: 40,
+                  width: width / 2.5,
+                  marginLeft: 100,
                 }}
-                type="outline"
-                titleStyle={{ color: "#00BCD4", fontSize: 20 }}
-                onPress={() => {
-                  if (pickedTeam.length != 0 && pickedVettura.length != 0) {
-                    sub_ToChamp(
-                      route.params.campionato.id,
-                      pickedTeam,
-                      pickedVettura
-                    ).then(() => {
-                      setIsSub(true);
-                      setIsVisible(false);
-                      updateLocalCampionato(
-                        route.params.campionato.id,
-                        setNumeroPartecipanti
-                      );
-                      //navigation.goBack();
-                    });
-                  }
+                dropDownMaxHeight={90}
+                onChangeItem={(item) => {
+                  setPickedTeam(item.label);
                 }}
-              ></Button>
+              />
             </View>
           </View>
-        </Modal>
-        <View
-          style={{
-            flexDirection: "row",
-            flex: 1,
-            marginTop: "10%",
-          }}
-        >
-          <View
-            style={{
-              marginHorizontal: "3%",
-              justifyContent: "center",
-              alignSelf: "center",
-            }}
-          >
-            <Image
-              style={{
-                width: 160,
-                height: 160,
-                borderRadius: 170 / 2,
-              }}
-              source={{
-                uri: logoURL,
-              }}
-            ></Image>
-          </View>
-          <View
-            style={{
-              flex: 1,
-              alignItems: "flex-start",
-              justifyContent: "center",
-              alignSelf: "center",
-            }}
-          >
-            <Text style={styles.nomeCampionato}>
-              {route.params.campionato.nome}
-            </Text>
-            <Text style={styles.infoCampionato}>
-              Numero di partecipanti: {numero_partecipanti}
-            </Text>
-            <Text style={styles.infoCampionato}>
-              Data inizio/prima gara:{" "}
-              {route.params.campionato.calendario[0].data}
-            </Text>
-            <Text style={styles.infoCampionato}>
-              Data fine/ultima gara:{" "}
-              {route.params.campionato.calendario[gare.length - 1].data}
-            </Text>
-          </View>
-        </View>
-        <View
-          style={{
-            flex: 3,
-            marginTop: heigth > 800 ? 0 : "2%",
-          }}
-        >
-          {/* TABELLA CON LE GARE */}
-          <ChampionStackScreen></ChampionStackScreen>
-          {/* FINE TABELLA CON LE GARE */}
-          <View style={{ marginVertical: "4%" }}>
+          <View style={styles.modalBottom}>
             <Button
-              buttonStyle={styles.buttonIscriviti}
-              titleStyle={styles.buttonIscrivitiText}
-              title={isSub ? "DISISCRIVITI" : "ISCRIVITI"}
+              title="Invia"
+              buttonStyle={{
+                width: width / 3,
+              }}
+              type="outline"
+              titleStyle={{ color: "#00BCD4", fontSize: 20 }}
               onPress={() => {
-                if (!isSub) setIsVisible(true);
-                else {
-                  removeUtenteFromChamp(route.params.campionato.id).then(() => {
-                    setIsSub(false);
+                if (pickedTeam.length != 0 && pickedVettura.length != 0) {
+                  sub_ToChamp(
+                    route.params.campionato.id,
+                    pickedTeam,
+                    pickedVettura
+                  ).then(() => {
+                    setIsSub(true);
+                    setIsVisible(false);
                     updateLocalCampionato(
                       route.params.campionato.id,
                       setNumeroPartecipanti
                     );
+                    //navigation.goBack();
                   });
                 }
               }}
             ></Button>
           </View>
         </View>
+      </Modal>
+      <View
+        style={{
+          flexDirection: "row",
+          flex: 1,
+          marginTop: "10%",
+        }}
+      >
+        <View
+          style={{
+            marginHorizontal: "3%",
+            justifyContent: "center",
+            alignSelf: "center",
+          }}
+        >
+          <Image
+            style={{
+              width: 160,
+              height: 160,
+              borderRadius: 170 / 2,
+            }}
+            source={{
+              uri: logoURL,
+            }}
+          ></Image>
+        </View>
+        <View
+          style={{
+            flex: 1,
+            alignItems: "flex-start",
+            justifyContent: "center",
+            alignSelf: "center",
+          }}
+        >
+          <Text style={styles.nomeCampionato}>
+            {route.params.campionato.nome}
+          </Text>
+          <Text style={styles.infoCampionato}>
+            Numero di partecipanti: {numero_partecipanti}
+          </Text>
+          <Text style={styles.infoCampionato}>
+            Data inizio/prima gara: {route.params.campionato.calendario[0].data}
+          </Text>
+          <Text style={styles.infoCampionato}>
+            Data fine/ultima gara:{" "}
+            {route.params.campionato.calendario[gare.length - 1].data}
+          </Text>
+        </View>
       </View>
-    );
-  }
+      <View
+        style={{
+          flex: 3,
+          marginTop: heigth > 800 ? 0 : "2%",
+        }}
+      >
+        {/* TABELLA CON LE GARE */}
+        <ChampionStackScreen></ChampionStackScreen>
+        {/* FINE TABELLA CON LE GARE */}
+        <View style={{ marginVertical: "4%" }}>
+          <Button
+            buttonStyle={styles.buttonIscriviti}
+            titleStyle={styles.buttonIscrivitiText}
+            title={isSub ? "DISISCRIVITI" : "ISCRIVITI"}
+            onPress={() => {
+              if (!isSub) setIsVisible(true);
+              else {
+                removeUtenteFromChamp(route.params.campionato.id).then(() => {
+                  setIsSub(false);
+                  updateLocalCampionato(
+                    route.params.campionato.id,
+                    setNumeroPartecipanti
+                  );
+                });
+              }
+            }}
+          ></Button>
+        </View>
+      </View>
+    </View>
+  );
 }
+
 const styles = StyleSheet.create({
   nomeCampionato: {
-    fontSize: 23,
-    fontWeight: "bold",
-    fontFamily: "spyagencygrad",
+    fontSize: 21,
+    fontFamily: "spyagencyexpand",
   },
   infoCampionato: {
     fontSize: 15,
     marginVertical: "2%",
   },
   buttonIscriviti: {
-    width: width / 3,
+    width: width / 2.5,
     backgroundColor: "white",
     alignSelf: "center",
   },
   buttonIscrivitiText: {
     color: "black",
+    fontFamily: "spyagencynorm",
   },
   modalContainer: {
     backgroundColor: "white",

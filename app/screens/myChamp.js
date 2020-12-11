@@ -28,7 +28,6 @@ function getCampionatiByUtente(setListaCampionati) {
 
 export default function myChamp({ navigation, route }) {
   const [listaCampionati, setListaCampionati] = React.useState([]);
-
   React.useEffect(() => {
     getCampionatiByUtente(setListaCampionati);
   }, [listaCampionati]);
@@ -45,7 +44,7 @@ export default function myChamp({ navigation, route }) {
     >
       <Avatar rounded size={40} source={{ uri: item.logo }}></Avatar>
       <ListItem.Content>
-        <ListItem.Title style={{ color: "white" }}>{item.nome}</ListItem.Title>
+        <ListItem.Title style={styles.testoTitle}>{item.nome}</ListItem.Title>
       </ListItem.Content>
       <ListItem.Chevron size={22} />
     </ListItem>
@@ -73,5 +72,10 @@ const styles = StyleSheet.create({
   image: {
     width: "100%",
     height: "100%",
+  },
+  testoTitle: {
+    color: "white",
+    fontFamily: "spyagencycond",
+    fontSize: 17,
   },
 });

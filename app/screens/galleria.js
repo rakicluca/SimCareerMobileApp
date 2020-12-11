@@ -42,7 +42,7 @@ export default function Gallery({ navigation, route }) {
     >
       <Avatar rounded size={40} source={{ uri: item.logo }}></Avatar>
       <ListItem.Content>
-        <ListItem.Title style={{ color: "white" }}>{item.nome}</ListItem.Title>
+        <ListItem.Title style={styles.testoTitle}>{item.nome}</ListItem.Title>
       </ListItem.Content>
       <ListItem.Chevron size={22} />
     </ListItem>
@@ -70,5 +70,18 @@ const styles = StyleSheet.create({
   image: {
     width: "100%",
     height: "100%",
+  },
+  testoSubtitle: {
+    color: "white",
+    fontSize: 12,
+  },
+  testoTitle: {
+    color: "white",
+    fontFamily: "spyagencycond",
+    fontSize: 17,
+  },
+  testoPunti: {
+    color: "white",
+    fontFamily: "spyagencynorm",
   },
 });

@@ -134,8 +134,7 @@ export default function Gara({ route }) {
 const styles = StyleSheet.create({
   nomeCampionato: {
     fontSize: 23,
-    fontWeight: "bold",
-    fontFamily: "spyagencygrad",
+    fontFamily: "spyagencyexpand",
   },
   infoCampionato: {
     fontSize: 15,

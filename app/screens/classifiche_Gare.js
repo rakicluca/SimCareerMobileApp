@@ -59,11 +59,13 @@ function setPosizione(index) {
     case 1:
       posizione = (
         <ListItem.Title
-          style={{
-            color: "#C9B037",
-            fontSize: 25,
-            fontWeight: "bold",
-          }}
+          style={[
+            styles.testoPunti,
+            {
+              color: "#C9B037",
+              fontSize: 35,
+            },
+          ]}
         >
           {index + 1}
         </ListItem.Title>
@@ -72,7 +74,7 @@ function setPosizione(index) {
     case 2:
       posizione = (
         <ListItem.Title
-          style={{ color: "#B4B4B4", fontSize: 25, fontWeight: "bold" }}
+          style={[styles.testoPunti, { color: "#B4B4B4", fontSize: 20 }]}
         >
           {index + 1}
         </ListItem.Title>
@@ -81,7 +83,7 @@ function setPosizione(index) {
     case 3:
       posizione = (
         <ListItem.Title
-          style={{ color: "#AD8A56", fontSize: 25, fontWeight: "bold" }}
+          style={[styles.testoPunti, { color: "#AD8A56", fontSize: 20 }]}
         >
           {index + 1}
         </ListItem.Title>
@@ -89,7 +91,7 @@ function setPosizione(index) {
       break;
     default:
       posizione = (
-        <ListItem.Title style={[styles.testo, { marginRight: "1.5%" }]}>
+        <ListItem.Title style={[styles.testoPunti, { marginRight: "1.5%" }]}>
           {index + 1}
         </ListItem.Title>
       );
@@ -100,7 +102,6 @@ function setPosizione(index) {
 export default function Classifiche_Gare({ navigation, route }) {
   const [classificaGare, setClassificaGare] = useState([]);
   React.useEffect(() => {
-    console.log("dentro useeffect gare");
     getClassificheGare(
       route.params.idCampionato,
       route.params.idGara,
@@ -126,12 +127,12 @@ export default function Classifiche_Gare({ navigation, route }) {
         avatarStyle={{ resizeMode: "cover" }}
       ></Avatar>
       <ListItem.Content>
-        <ListItem.Title style={styles.testo}>{item.nome}</ListItem.Title>
-        <ListItem.Subtitle style={[styles.testo, { fontSize: 12 }]}>
+        <ListItem.Title style={styles.testoTitle}>{item.nome}</ListItem.Title>
+        <ListItem.Subtitle style={styles.testoSubtitle}>
           {item.team}
         </ListItem.Subtitle>
       </ListItem.Content>
-      <ListItem.Title style={[styles.testo]}>{item.tempo}</ListItem.Title>
+      <ListItem.Title style={styles.testoPunti}>{item.tempo}</ListItem.Title>
     </ListItem>
   );
 
@@ -156,5 +157,18 @@ const styles = StyleSheet.create({
   },
   spacing: {
     marginTop: "3%",
+  },
+  testoSubtitle: {
+    color: "white",
+    fontSize: 12,
+  },
+  testoTitle: {
+    color: "white",
+    fontFamily: "spyagencycond",
+    fontSize: 17,
+  },
+  testoPunti: {
+    color: "white",
+    fontFamily: "spyagencynorm",
   },
 });

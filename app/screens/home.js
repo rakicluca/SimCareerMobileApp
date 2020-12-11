@@ -24,6 +24,8 @@ import config from "../config/config";
 import Campionati from "./campionati.js";
 import syncStorage from "sync-storage";
 import Gara from "./gara";
+import { useFonts } from "@use-expo/font";
+import { AppLoading } from "expo";
 let listaPreferiti = new Array();
 
 const ChampionStack = createStackNavigator();
@@ -72,14 +74,19 @@ const getAllcampionati = ({ navigation }) => {
   const [removePref, setRemovePref] = React.useState([]);
   React.useEffect(() => {
     //Get Preferiti
-    fetch(config.url.path + "/campionati/preferiti/" + global.username, {
-      method: "PUT",
-      dataType: "json",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-    })
+    fetch(
+      config.url.path +
+        "/campionati/preferiti/" +
+        syncStorage.get("utente").username,
+      {
+        method: "PUT",
+        dataType: "json",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      }
+    )
       .then((response) => {
         if (response.status === 200) {
           return response.json();
@@ -134,7 +141,9 @@ const getAllcampionati = ({ navigation }) => {
     >
       <Avatar rounded size={40} source={{ uri: item.logo }}></Avatar>
       <ListItem.Content>
-        <ListItem.Title style={{ color: "white" }}>{item.nome}</ListItem.Title>
+        <ListItem.Title style={{ color: "white", fontFamily: "spyagencynorm" }}>
+          {item.nome}
+        </ListItem.Title>
       </ListItem.Content>
       <Icon
         size={25}
@@ -159,14 +168,19 @@ const getAllcampionati = ({ navigation }) => {
   const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
     //Get Preferiti
-    fetch(config.url.path + "/campionati/preferiti/" + global.username, {
-      method: "PUT",
-      dataType: "json",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-    })
+    fetch(
+      config.url.path +
+        "/campionati/preferiti/" +
+        syncStorage.get("utente").username,
+      {
+        method: "PUT",
+        dataType: "json",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      }
+    )
       .then((response) => {
         if (response.status === 200) {
           return response.json();
@@ -210,7 +224,9 @@ const getPreferiti = ({ navigation }) => {
     //Get Preferiti
     try {
       let response = await fetch(
-        config.url.path + "/campionati/preferiti/" + global.username,
+        config.url.path +
+          "/campionati/preferiti/" +
+          syncStorage.get("utente").username,
         {
           method: "PUT",
           dataType: "json",
@@ -248,7 +264,9 @@ const getPreferiti = ({ navigation }) => {
       }}
     >
       <Avatar rounded size={40} source={{ uri: item.logo }}></Avatar>
-      <ListItem.Title style={{ color: "white" }}>{item.nome}</ListItem.Title>
+      <ListItem.Title style={{ color: "white", fontFamily: "spyagencynorm" }}>
+        {item.nome}
+      </ListItem.Title>
     </ListItem>
   );
   let keyItemLista = (item, index) => index.toString();
@@ -270,19 +288,24 @@ const getPreferiti = ({ navigation }) => {
 
 const addPreferiti = () => {
   try {
-    fetch(config.url.path + "/campionati/preferiti/" + global.username, {
-      method: "POST",
-      dataType: "json",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify([
-        {
-          campionati_preferiti: listaPreferiti,
+    fetch(
+      config.url.path +
+        "/campionati/preferiti/" +
+        syncStorage.get("utente").username,
+      {
+        method: "POST",
+        dataType: "json",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
         },
-      ]),
-    }).then((response) => {
+        body: JSON.stringify([
+          {
+            campionati_preferiti: listaPreferiti,
+          },
+        ]),
+      }
+    ).then((response) => {
       if (response.status === 200) {
         return response.json();
       } else {
@@ -296,7 +319,6 @@ const addPreferiti = () => {
 export default function Home({ navigation }) {
   //this method will be called whenever a user interacts with a notification (eg. taps on it).
   Notifications.addNotificationResponseReceivedListener((response) => {
-    console.log("OH YEAH");
     switch (response.notification.request.content.data.type) {
       case "campionato":
         {
@@ -354,6 +376,22 @@ export default function Home({ navigation }) {
         break;
     }
   });
-
-  return <ChampionStackScreen />;
+  //Load custom font
+  const [isLoaded] = useFonts({
+    spyagencygrad: require("../../assets/fonts/SpyAgency/spyagency3grad.ttf"),
+    spyagencynorm: require("../../assets/fonts/SpyAgency/spyagency3.ttf"),
+    spyagencynormItal: require("../../assets/fonts/SpyAgency/spyagency3ital.ttf"),
+    spyagencylaser: require("../../assets/fonts/SpyAgency/spyagency3laser.ttf"),
+    spyagencyout: require("../../assets/fonts/SpyAgency/spyagency3out.ttf"),
+    spyagencyexpand: require("../../assets/fonts/SpyAgency/spyagency3expand.ttf"),
+    spyagency3d: require("../../assets/fonts/SpyAgency/spyagency33d.ttf"),
+    spyagencycond: require("../../assets/fonts/SpyAgency/spyagency3cond.ttf"),
+    spyagencycondItal: require("../../assets/fonts/SpyAgency/spyagency3condital.ttf"),
+    spyagencycollege: require("../../assets/fonts/SpyAgency/spyagencyv3_2college.ttf"),
+  });
+  if (!isLoaded) {
+    return <AppLoading />;
+  } else {
+    return <ChampionStackScreen />;
+  }
 }

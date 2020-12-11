@@ -80,9 +80,11 @@ function getGare(navigation, listaGare, calendario) {
         <ListItem.Title
           style={{
             alignSelf: "center",
+            justifyContent: "center",
             color: "white",
             marginBottom: 10,
-            fontSize: 18,
+            fontSize: 17,
+            fontFamily: "spyagencycond",
           }}
         >
           {item.nome}
@@ -104,7 +106,12 @@ function getGare(navigation, listaGare, calendario) {
         />
       </ListItem.Content>
       <ListItem.Title
-        style={{ alignSelf: "center", color: "white", fontSize: 14 }}
+        style={{
+          alignSelf: "center",
+          color: "white",
+          fontSize: 14,
+          fontFamily: "spyagencycond",
+        }}
       >
         {listaGare[index].data}
       </ListItem.Title>

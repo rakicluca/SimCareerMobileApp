@@ -68,8 +68,8 @@ function setPosizione(index) {
         <ListItem.Title
           style={{
             color: "#C9B037",
-            fontSize: 25,
-            fontWeight: "bold",
+            fontSize: 35,
+            fontFamily: "spyagencyexpand",
           }}
         >
           {index + 1}
@@ -79,7 +79,11 @@ function setPosizione(index) {
     case 2:
       posizione = (
         <ListItem.Title
-          style={{ color: "#B4B4B4", fontSize: 25, fontWeight: "bold" }}
+          style={{
+            color: "#B4B4B4",
+            fontSize: 20,
+            fontFamily: "spyagencyexpand",
+          }}
         >
           {index + 1}
         </ListItem.Title>
@@ -88,7 +92,11 @@ function setPosizione(index) {
     case 3:
       posizione = (
         <ListItem.Title
-          style={{ color: "#AD8A56", fontSize: 25, fontWeight: "bold" }}
+          style={{
+            color: "#AD8A56",
+            fontSize: 20,
+            fontFamily: "spyagencyexpand",
+          }}
         >
           {index + 1}
         </ListItem.Title>
@@ -96,7 +104,12 @@ function setPosizione(index) {
       break;
     default:
       posizione = (
-        <ListItem.Title style={[styles.testo, { marginRight: "1.5%" }]}>
+        <ListItem.Title
+          style={[
+            styles.testo,
+            { marginRight: "1.5%", fontFamily: "spyagencyexpand" },
+          ]}
+        >
           {index + 1}
         </ListItem.Title>
       );
@@ -124,12 +137,14 @@ function renderItem(filter, classificaChamp) {
           avatarStyle={{ resizeMode: "cover" }}
         ></Avatar>
         <ListItem.Content>
-          <ListItem.Title style={styles.testo}>{item.nome}</ListItem.Title>
-          <ListItem.Subtitle style={[styles.testo, { fontSize: 12 }]}>
+          <ListItem.Title style={styles.testoTitle}>{item.nome}</ListItem.Title>
+          <ListItem.Subtitle style={styles.testoSubtitle}>
             {item.team}
           </ListItem.Subtitle>
         </ListItem.Content>
-        <ListItem.Title style={[styles.testo]}>{item.punti}</ListItem.Title>
+        <ListItem.Title style={[styles.testoPunti]}>
+          {item.punti}
+        </ListItem.Title>
       </ListItem>
     );
     return (
@@ -160,12 +175,14 @@ function renderItem(filter, classificaChamp) {
           avatarStyle={{ resizeMode: "cover" }}
         ></Avatar>
         <ListItem.Content>
-          <ListItem.Title style={styles.testo}>{item.team}</ListItem.Title>
-          <ListItem.Subtitle style={[styles.testo, { fontSize: 12 }]}>
+          <ListItem.Title style={styles.testoTitle}>{item.team}</ListItem.Title>
+          <ListItem.Subtitle style={styles.testoSubtitle}>
             {item.auto}
           </ListItem.Subtitle>
         </ListItem.Content>
-        <ListItem.Title style={[styles.testo]}>{item.punti}</ListItem.Title>
+        <ListItem.Title style={[styles.testoPunti]}>
+          {item.punti}
+        </ListItem.Title>
       </ListItem>
     );
     return (
@@ -220,6 +237,19 @@ export default function classiche_Campionati({ navigation, route }) {
 const styles = StyleSheet.create({
   testo: {
     color: "white",
+  },
+  testoSubtitle: {
+    color: "white",
+    fontSize: 12,
+  },
+  testoTitle: {
+    color: "white",
+    fontFamily: "spyagencycond",
+    fontSize: 17,
+  },
+  testoPunti: {
+    color: "white",
+    fontFamily: "spyagencynorm",
   },
   spacing: {
     marginTop: "3%",

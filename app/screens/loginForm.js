@@ -367,10 +367,20 @@ export default function LoginForm({ navigation }) {
                     titleStyle={{ color: "#00BCD4", fontSize: 20 }}
                     onPress={() => {
                       sendEmailForResetPassword(email_for_reset).then((res) => {
-                        if (res.status == "404")
+                        if (res.status == "404") {
                           setErrorMessage("Email non registrata");
-                        else {
+                          showMessage({
+                            message:
+                              "La mail inserita non è associata a nessun account",
+                            type: "danger",
+                          });
+                        } else {
                           setIsVisible(false);
+                          showMessage({
+                            message:
+                              "Reset della password avvenuto con successo, controlla la tua email",
+                            type: "success",
+                          });
                           setErrorMessage("");
                         }
                       });
