@@ -13,6 +13,7 @@ import {
   Dimensions,
   Platform,
   Keyboard,
+  StatusBar,
 } from "react-native";
 import { Button, Icon } from "react-native-elements";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -27,7 +28,7 @@ import DropDownPicker from "react-native-dropdown-picker";
 import syncStorage from "sync-storage";
 
 let width = Dimensions.get("screen").width;
-let heigth = Dimensions.get("screen").height;
+let height = Dimensions.get("screen").height;
 
 function getData(dataName) {
   let data = SyncStorage.get(dataName);
@@ -289,8 +290,9 @@ export default function Campionati({ navigation, route }) {
       <View
         style={{
           flexDirection: "row",
-          flex: 1,
-          marginTop: "10%",
+          flex: 1.5,
+          marginTop: StatusBar.currentHeight / 1.8,
+          justifyContent: "space-evenly",
         }}
       >
         <View
@@ -302,9 +304,9 @@ export default function Campionati({ navigation, route }) {
         >
           <Image
             style={{
-              width: 160,
-              height: 160,
-              borderRadius: 170 / 2,
+              width: height < 732 ? 130 : 180,
+              height: height < 732 ? 130 : 180,
+              borderRadius: height < 732 ? 130 / 2 : 180 / 2,
             }}
             source={{
               uri: logoURL,
@@ -317,9 +319,10 @@ export default function Campionati({ navigation, route }) {
             alignItems: "flex-start",
             justifyContent: "center",
             alignSelf: "center",
+            flexWrap: "wrap",
           }}
         >
-          <Text style={styles.nomeCampionato}>
+          <Text style={styles.nomeCampionato} numberOfLines={4}>
             {route.params.campionato.nome}
           </Text>
           <Text style={styles.infoCampionato}>
@@ -337,7 +340,7 @@ export default function Campionati({ navigation, route }) {
       <View
         style={{
           flex: 3,
-          marginTop: heigth > 800 ? 0 : "2%",
+          //marginTop: height > 800 ? 0 : "2%",
         }}
       >
         {/* TABELLA CON LE GARE */}
@@ -369,7 +372,7 @@ export default function Campionati({ navigation, route }) {
 
 const styles = StyleSheet.create({
   nomeCampionato: {
-    fontSize: 21,
+    fontSize: height < 730 ? 18 : 21,
     fontFamily: "spyagencyexpand",
   },
   infoCampionato: {
@@ -377,7 +380,7 @@ const styles = StyleSheet.create({
     marginVertical: "2%",
   },
   buttonIscriviti: {
-    width: width / 2.5,
+    width: width / 1.9,
     backgroundColor: "white",
     alignSelf: "center",
   },
@@ -404,7 +407,7 @@ const styles = StyleSheet.create({
   },
   modalBottom: {
     alignItems: "center",
-    marginTop: heigth > 800 ? "10%" : "5%",
+    marginTop: height > 800 ? "10%" : "5%",
   },
   modalButton: {
     fontSize: 25,

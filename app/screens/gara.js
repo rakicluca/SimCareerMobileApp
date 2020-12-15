@@ -12,6 +12,7 @@ import {
   Dimensions,
   Platform,
   Keyboard,
+  StatusBar,
 } from "react-native";
 import InfoGara from "./info_Gara";
 import ClassificaGara from "./classifiche_Gare";
@@ -77,7 +78,7 @@ export default function Gara({ route }) {
         style={{
           flexDirection: "row",
           flex: 1,
-          marginTop: "10%",
+          marginTop: StatusBar.currentHeight,
         }}
       >
         <View
@@ -86,14 +87,15 @@ export default function Gara({ route }) {
             justifyContent: "center",
             alignSelf: "center",
             backgroundColor: "white",
-            borderRadius: 170,
+            borderRadius: height < 732 ? 130 / 2 : 160 / 2,
           }}
         >
           <Image
             style={{
-              width: 160,
-              height: 160,
-              borderRadius: 170 / 2,
+              width: height < 732 ? 130 : 160,
+              height: height < 732 ? 130 : 160,
+              borderRadius: height < 732 ? 130 / 2 : 160 / 2,
+
               resizeMode: "contain",
             }}
             source={{
@@ -107,6 +109,7 @@ export default function Gara({ route }) {
             alignItems: "flex-start",
             justifyContent: "center",
             alignSelf: "center",
+            flexWrap: "wrap",
           }}
         >
           <Text style={styles.nomeCampionato}>{route.params.gara.nome}</Text>
@@ -133,7 +136,7 @@ export default function Gara({ route }) {
 }
 const styles = StyleSheet.create({
   nomeCampionato: {
-    fontSize: 23,
+    fontSize: 21,
     fontFamily: "spyagencyexpand",
   },
   infoCampionato: {

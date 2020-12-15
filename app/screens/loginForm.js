@@ -15,6 +15,7 @@ import {
   Dimensions,
   Platform,
   Keyboard,
+  SafeAreaView,
 } from "react-native";
 import { Button, Icon, Input } from "react-native-elements";
 import Modal from "react-native-modal";
@@ -119,17 +120,23 @@ export default function LoginForm({ navigation }) {
     };
     checkDeviceForHardware();
     checkForBiometrics();
+  }, []);
+  React.useEffect(() => {
     getUser("utenteFingerprint")
       .then((response) => {
         return response;
       })
       .then((res) => {
-        utenteFingerprint = JSON.parse(res);
-        if (utenteFingerprint != undefined) {
-          handleAuthentication();
+        try {
+          utenteFingerprint = JSON.parse(res);
+          if (utenteFingerprint != undefined) {
+            handleAuthentication();
+          }
+        } catch (error) {
+          console.log(error);
         }
       });
-  }, []);
+  }, [utenteFingerprint]);
 
   const onSubmit = () => {
     global.username = getValues("username");
@@ -233,7 +240,7 @@ export default function LoginForm({ navigation }) {
     return <AppLoading />;
   } else {
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
         <ScrollView showsVerticalScrollIndicator={false}>
           <Text style={styles.header}>SIM CAREER</Text>
           <Image
@@ -403,20 +410,30 @@ export default function LoginForm({ navigation }) {
             titleStyle={{ fontFamily: "spyagencynorm", fontSize: 13 }}
             onPress={() => {
               getUser("utenteFingerprint").then((response) => {
-                utenteFingerprint = JSON.parse(response);
-                if (response != undefined) handleAuthentication();
-                else
+                try {
+                  utenteFingerprint = JSON.parse(response);
+                  if (response != undefined) handleAuthentication();
+                  else
+                    showMessage({
+                      message:
+                        "Per usare questa funzione fare l'accesso ed abilitarla nelle impostazioni del proprio account",
+                      type: "info",
+                      duration: 3200,
+                    });
+                } catch (error) {
                   showMessage({
                     message:
-                      "Per usare questa funzione fare l'accesso ed abilitarla nelle impostazioni del proprio account",
+                      "Se hai effettuato il logout devi accedere ed attivare questa funzione nelle impostazioni del tuo profilo",
                     type: "info",
                     duration: 3200,
                   });
+                  console.log(error);
+                }
               });
             }}
           />
         </View>
-      </View>
+      </SafeAreaView>
     );
   }
 }
@@ -452,12 +469,12 @@ const styles = StyleSheet.create({
     color: "red",
   },
   container: {
-    flex: 1,
     backgroundColor: "rgba(51, 102, 255, 0.73)",
     width: screenWidth,
+    flex: 1,
   },
   header: {
-    fontSize: 50,
+    fontSize: screenHight < 700 ? 45 : 50,
     marginTop: screenHight * 0.047,
     color: "white",
     fontFamily: "spyagencygrad",

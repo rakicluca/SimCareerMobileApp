@@ -27,6 +27,7 @@ import DropDownPicker from "react-native-dropdown-picker";
 import { AppLoading } from "expo";
 import { showMessage } from "react-native-flash-message";
 import * as ImagePicker from "expo-image-picker";
+import { CommonActions } from "@react-navigation/native";
 
 let width = Dimensions.get("screen").width;
 let height = Dimensions.get("screen").height;
@@ -34,6 +35,16 @@ let height = Dimensions.get("screen").height;
 function getData(dataName) {
   let data = syncStorage.get(dataName);
   return JSON.parse(data);
+}
+
+async function logout(navigation) {
+  syncStorage.remove("utenteFingerprint");
+  navigation.dispatch(
+    CommonActions.reset({
+      index: 0,
+      routes: [{ name: "LoginForm" }],
+    })
+  );
 }
 
 function getListaVetture(setListaVetture) {
@@ -73,7 +84,7 @@ async function getListaCircuiti(setListaCircuiti) {
     });
 }
 
-const InfoUtente = () => {
+const InfoUtente = ({ navigation }) => {
   let utente = syncStorage.get("utente");
   let utenteFingerprint = syncStorage.get("utenteFingerprint");
   const { control, errors, handleSubmit, getValues, setValue } = useForm({
@@ -116,6 +127,7 @@ const InfoUtente = () => {
   React.useEffect(() => {
     getListaVetture(setListaVetture);
     getListaCircuiti(setListaCircuiti);
+    console.log(width, height);
   }, []);
 
   //OnSubmit Form
@@ -586,7 +598,7 @@ const ProfileTabNavScreen = () => (
   </ProfileTabNav.Navigator>
 );
 
-export default function Profile() {
+export default function Profile({ navigation }) {
   let utente = syncStorage.get("utente");
   //Set image picker
   const [selectedImage, setSelectedImage] = React.useState({
@@ -625,12 +637,18 @@ export default function Profile() {
     };
   };
   return (
-    <View style={{ flex: 1, backgroundColor: "rgba(51, 102, 255, 0.6)" }}>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: "rgba(51, 102, 255, 0.6)",
+      }}
+    >
       <View
         style={{
           flexDirection: "row",
           flex: 1,
           marginTop: "10%",
+          justifyContent: "space-evenly",
         }}
       >
         <View
@@ -638,16 +656,14 @@ export default function Profile() {
             marginHorizontal: "3%",
             justifyContent: "center",
             alignSelf: "center",
-            backgroundColor: "white",
-            borderRadius: 170,
           }}
         >
           <TouchableOpacity onPress={openImagePickerAsync}>
             <Image
               style={{
-                width: 180,
-                height: 180,
-                borderRadius: 190 / 2,
+                width: height < 732 ? 130 : 180,
+                height: height < 732 ? 130 : 180,
+                borderRadius: height < 732 ? 130 / 2 : 180 / 2,
                 resizeMode: "cover",
               }}
               source={{
@@ -658,7 +674,6 @@ export default function Profile() {
         </View>
         <View
           style={{
-            flex: 1,
             justifyContent: "center",
             alignItems: "center",
           }}
@@ -668,16 +683,14 @@ export default function Profile() {
             <Text style={styles.nomeUtente}>{utente.nome}</Text>
             <Text style={styles.nomeUtente}>{utente.cognome}</Text>
           </View>
-
-          {/*           <Text style={styles.infoCampionato}>
-            Data inizio gara:{" "}
-            {route.params.campionato.calendario[route.params.index].data}
-          </Text> */}
-          {/*           <Text style={styles.infoCampionato}>
-            Numero di partecipanti:{" "}
-            {route.params.campionato.piloti_iscritti.length}
-          </Text> */}
         </View>
+        <TouchableOpacity
+          onPress={() => {
+            logout(navigation);
+          }}
+        >
+          <Icon name="log-out" type="feather" size={28} />
+        </TouchableOpacity>
       </View>
       <View
         style={{

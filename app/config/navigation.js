@@ -22,7 +22,6 @@ const LoginStackScreen = () => (
     <LoginStack.Screen name="RegistrationForm" component={RegForm} />
     <LoginStack.Screen name="AppTabs" component={AppTabsScreen} />
     <LoginStack.Screen name="GridGallery" component={GridGallery} />
-    <LoginStack.Screen name="Campionati" component={Campionati} />
   </LoginStack.Navigator>
 );
 

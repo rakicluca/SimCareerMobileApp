@@ -220,37 +220,63 @@ const getPreferiti = ({ navigation }) => {
   const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
     //Add Preferiti
-    addPreferiti();
-    //Get Preferiti
-    try {
-      let response = await fetch(
-        config.url.path +
-          "/campionati/preferiti/" +
-          syncStorage.get("utente").username,
-        {
-          method: "PUT",
-          dataType: "json",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-        }
-      )
-        .then((response) => {
-          if (response.status === 200) {
-            return response.json();
-          } else {
-            console.error("status not 200");
+    addPreferiti().then(async () => {
+      try {
+        await fetch(
+          config.url.path +
+            "/campionati/preferiti/" +
+            syncStorage.get("utente").username,
+          {
+            method: "PUT",
+            dataType: "json",
+            headers: {
+              Accept: "application/json",
+              "Content-Type": "application/json",
+            },
           }
-        })
-        .then((response) => {
-          setrespPref(response);
-        });
-      setRefreshing(false);
-    } catch (error) {
-      console.error(error);
-    }
+        )
+          .then((response) => {
+            if (response.status === 200) {
+              return response.json();
+            } else {
+              console.error("status not 200");
+            }
+          })
+          .then((response) => {
+            setrespPref(response);
+          });
+        setRefreshing(false);
+      } catch (error) {
+        console.error(error);
+      }
+    });
   }, [refreshing]);
+  React.useEffect(() => {
+    console.log("dentro use");
+    fetch(
+      config.url.path +
+        "/campionati/preferiti/" +
+        syncStorage.get("utente").username,
+      {
+        method: "PUT",
+        dataType: "json",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      }
+    )
+      .then((response) => {
+        if (response.status === 200) {
+          return response.json();
+        } else {
+          console.error("status not 200");
+        }
+      })
+      .then((response) => {
+        setrespPref(response);
+      });
+  }, []);
   let itemRender = ({ item, index }) => (
     <ListItem
       bottomDivider
@@ -286,9 +312,9 @@ const getPreferiti = ({ navigation }) => {
   );
 };
 
-const addPreferiti = () => {
+const addPreferiti = async () => {
   try {
-    fetch(
+    return fetch(
       config.url.path +
         "/campionati/preferiti/" +
         syncStorage.get("utente").username,

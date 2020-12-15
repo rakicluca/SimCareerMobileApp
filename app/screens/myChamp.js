@@ -17,7 +17,8 @@ function getCampionatiByUtente(setListaCampionati) {
         }
       })
       .then((response) => {
-        setListaCampionati(response);
+        //console.log(response);
+        setListaCampionati(...[response]);
       })
       .catch((err) => {
         console.info(err);
@@ -28,15 +29,17 @@ function getCampionatiByUtente(setListaCampionati) {
 
 export default function myChamp({ navigation, route }) {
   const [listaCampionati, setListaCampionati] = React.useState([]);
+
   React.useEffect(() => {
     getCampionatiByUtente(setListaCampionati);
-  }, [listaCampionati]);
+    //console.log(listaCampionati);
+  }, []);
 
   let itemRender = ({ item }) => (
     <ListItem
       Component={TouchableOpacity}
       onPress={() => {
-        navigation.push("Campionati", { campionato: item });
+        navigation.navigate("Campionati", { campionato: item });
       }}
       bottomDivider
       containerStyle={{ backgroundColor: "rgba(51, 102, 255,0.5)" }}
