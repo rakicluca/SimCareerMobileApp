@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useFonts } from "@use-expo/font";
 import { AppLoading } from "expo";
 import { useForm, Controller } from "react-hook-form";
@@ -16,6 +16,8 @@ import {
   Platform,
   Keyboard,
   SafeAreaView,
+  Animated,
+  Easing,
 } from "react-native";
 import { Button, Icon, Input } from "react-native-elements";
 import Modal from "react-native-modal";
@@ -27,8 +29,8 @@ import * as Notifications from "expo-notifications";
 import * as LocalAuthentication from "expo-local-authentication";
 import { showMessage } from "react-native-flash-message";
 
-let screenWidth = Dimensions.get("window").width;
-let screenHight = Dimensions.get("window").height;
+let screenWidth = Dimensions.get("screen").width;
+let screenHight = Dimensions.get("screen").height;
 
 const registerForPushNotifications = async (utente) => {
   const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
@@ -69,6 +71,10 @@ export default function LoginForm({ navigation }) {
   } = useForm();
   const [loginSuccess, setLoginSuccess] = React.useState(false);
   const [rememberMeCheck, setRememberMeCheck] = React.useState(false);
+  const scrollY = React.useRef(new Animated.Value(0)).current;
+  const animatedBounce = React.useRef(new Animated.Value(0)).current;
+  const [stopAnimat, setStopAnimat] = React.useState(false);
+  const [contentHeightScroll, setContentHeightScroll] = useState(screenHight);
 
   //Checkbox Settings
   const [toggleCheckBox, setToggleCheckBox] = React.useState(false);
@@ -87,39 +93,56 @@ export default function LoginForm({ navigation }) {
       onSubmit();
     }
   };
-  React.useEffect(() => {
-    rememberMeOnLoad();
-    //Fingerprint check for device compatibility
-    async function checkDeviceForHardware() {
-      let compatible = await LocalAuthentication.hasHardwareAsync();
-      if (compatible) {
-        console.log("Compatible Device!");
-      } else {
-        console.log("Current device does not have the necessary hardware!");
-        showMessage({
-          message:
-            "Il tuo dispositivo non dispone del lettore d'impronte digitali",
-          type: "warning",
-        });
-      }
+  //Fingerprint check for device compatibility
+  async function checkDeviceForHardware() {
+    let compatible = await LocalAuthentication.hasHardwareAsync();
+    if (compatible) {
+      console.log("Compatible Device!");
+    } else {
+      console.log("Current device does not have the necessary hardware!");
     }
-    //Fingerprint check for user fingerprint records
-    const checkForBiometrics = async () => {
-      let biometricRecords = await LocalAuthentication.isEnrolledAsync();
-      if (!biometricRecords) {
-        console.log("No Biometrics Found");
-        showMessage({
-          message:
-            "Non sono state trovate impronte digitali registrate nel tuo dispositivo, vai nelle impostazioni del tuo dispositivo ed aggiungile",
-          type: "warning",
-          duration: 2500,
-        });
-      } else {
-        console.log("Biometrics Found");
-      }
-    };
-    checkDeviceForHardware();
-    checkForBiometrics();
+    return compatible;
+  }
+  //Fingerprint check for user fingerprint records
+  const checkForBiometrics = async () => {
+    let biometricRecords = await LocalAuthentication.isEnrolledAsync();
+    if (!biometricRecords) {
+      console.log("No Biometrics Found");
+    } else {
+      console.log("Biometrics Found");
+    }
+    return biometricRecords;
+  };
+
+  function spring() {
+    if (!stopAnimat) animatedBounce.setValue(0.3);
+    Animated.spring(animatedBounce, {
+      toValue: 1,
+      friction: 1,
+      useNativeDriver: true,
+    }).start(() => {
+      //console.log(stopAnimation);
+      if (!stopAnimat) spring();
+      else console.log("else start", stopAnimat);
+    });
+  }
+  React.useEffect(() => {
+    spring();
+    rememberMeOnLoad();
+    if (!checkDeviceForHardware()) {
+      showMessage({
+        message:
+          "Il tuo dispositivo non dispone del lettore d'impronte digitali",
+        type: "warning",
+      });
+    } else if (!checkForBiometrics()) {
+      showMessage({
+        message:
+          "Non sono state trovate impronte digitali registrate nel tuo dispositivo, vai nelle impostazioni del tuo dispositivo ed aggiungile",
+        type: "warning",
+        duration: 2500,
+      });
+    }
   }, []);
   React.useEffect(() => {
     getUser("utenteFingerprint")
@@ -235,18 +258,35 @@ export default function LoginForm({ navigation }) {
   const [isVisible, setIsVisible] = React.useState(false);
   const [email_for_reset, setEmail_for_reset] = React.useState("");
   const [errorMessage, setErrorMessage] = React.useState("");
+  const ScrollViewRef = React.useRef();
 
   if (!isLoaded) {
     return <AppLoading />;
   } else {
     return (
       <SafeAreaView style={styles.container}>
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView
+          ref={ScrollViewRef}
+          contentContainerStyle={{ flexGrow: 1 }}
+          showsVerticalScrollIndicator={false}
+          onContentSizeChange={(contentWidth, contentHeight) => {
+            console.log("St", contentWidth, contentHeight);
+            setContentHeightScroll(contentHeight);
+          }}
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            { useNativeDriver: false }
+          )}
+          onScrollBeginDrag={() => {
+            setStopAnimat(true);
+          }}
+        >
           <Text style={styles.header}>SIM CAREER</Text>
           <Image
             source={require("../../assets/img/bdLogo.png")}
             style={styles.ImgUtente}
           />
+
           <View style={styles.regform}>
             <Controller
               control={control}
@@ -326,13 +366,49 @@ export default function LoginForm({ navigation }) {
             {errors.checkboxTds && (
               <Text style={styles.errorText}>Campo richiesto</Text>
             )}
-            <View style={styles.buttonRegistrati}>
-              <Button
-                title={"Login"}
-                titleStyle={styles.textbuttonLogin}
-                onPress={handleSubmit(onSubmit)}
-                buttonStyle={styles.buttonLogin}
-              />
+            <View
+              style={{
+                flexDirection: "row-reverse",
+                width: screenWidth,
+                marginTop: "10%",
+              }}
+            >
+              <View style={{ flex: 1, alignSelf: "center" }}>
+                {contentHeightScroll > screenHight ? (
+                  <Animated.View
+                    style={{
+                      transform: [{ scale: animatedBounce }],
+                      opacity: scrollY.interpolate({
+                        inputRange: [0, contentHeightScroll - screenHight],
+                        outputRange: [1, 0],
+                      }),
+                    }}
+                  >
+                    <TouchableOpacity
+                      onPress={() => {
+                        ScrollViewRef.current.scrollToEnd({ animated: true });
+                      }}
+                    >
+                      <Icon
+                        name="arrow-down-circle"
+                        type="feather"
+                        color="white"
+                        size={37}
+                      ></Icon>
+                    </TouchableOpacity>
+                  </Animated.View>
+                ) : (
+                  <View />
+                )}
+              </View>
+              <View style={{ flex: 2, alignItems: "flex-end" }}>
+                <Button
+                  title={"Login"}
+                  titleStyle={styles.textbuttonLogin}
+                  onPress={handleSubmit(onSubmit)}
+                  buttonStyle={styles.buttonLogin}
+                />
+              </View>
             </View>
             <TouchableOpacity
               onPress={() => navigation.push("RegistrationForm")}
@@ -402,37 +478,42 @@ export default function LoginForm({ navigation }) {
               </View>
             </Modal>
           </View>
-        </ScrollView>
-        <View style={styles.fingerprint}>
-          <Button
-            title="Accedi con riconoscimento biometrico"
-            buttonStyle={{ backgroundColor: "transparent" }}
-            titleStyle={{ fontFamily: "spyagencynorm", fontSize: 13 }}
-            onPress={() => {
-              getUser("utenteFingerprint").then((response) => {
-                try {
-                  utenteFingerprint = JSON.parse(response);
-                  if (response != undefined) handleAuthentication();
-                  else
-                    showMessage({
-                      message:
-                        "Per usare questa funzione fare l'accesso ed abilitarla nelle impostazioni del proprio account",
-                      type: "info",
-                      duration: 3200,
-                    });
-                } catch (error) {
-                  showMessage({
-                    message:
-                      "Se hai effettuato il logout devi accedere ed attivare questa funzione nelle impostazioni del tuo profilo",
-                    type: "info",
-                    duration: 3200,
+          {checkDeviceForHardware ? (
+            <View style={styles.fingerprint}>
+              <Button
+                title="Accedi con riconoscimento biometrico"
+                buttonStyle={{ backgroundColor: "transparent" }}
+                titleStyle={{ fontFamily: "spyagencynorm", fontSize: 13 }}
+                onPress={() => {
+                  getUser("utenteFingerprint").then((response) => {
+                    try {
+                      if (response != undefined) {
+                        utenteFingerprint = JSON.parse(response);
+                        handleAuthentication();
+                      } else
+                        showMessage({
+                          message:
+                            "Per usare questa funzione fare l'accesso ed abilitarla nelle impostazioni del proprio account",
+                          type: "info",
+                          duration: 3200,
+                        });
+                    } catch (error) {
+                      showMessage({
+                        message:
+                          "Se hai effettuato il logout devi accedere ed attivare questa funzione nelle impostazioni del tuo profilo",
+                        type: "info",
+                        duration: 3200,
+                      });
+                      console.log(error);
+                    }
                   });
-                  console.log(error);
-                }
-              });
-            }}
-          />
-        </View>
+                }}
+              />
+            </View>
+          ) : (
+            <AppLoading />
+          )}
+        </ScrollView>
       </SafeAreaView>
     );
   }
@@ -458,7 +539,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   buttonLogin: {
-    marginTop: screenHight * 0.08,
     width: screenWidth / 3,
   },
   dotStyle: {
@@ -537,8 +617,8 @@ const styles = StyleSheet.create({
     color: "#00BCD4",
   },
   fingerprint: {
-    flex: 1,
     justifyContent: "flex-end",
+    flex: 1,
   },
 });
 

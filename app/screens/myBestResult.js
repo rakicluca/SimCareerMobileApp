@@ -1,20 +1,20 @@
 import config from "../config/config";
 import React from "react";
 import { View, StyleSheet, FlatList, TouchableOpacity } from "react-native";
-import { Avatar, Image, ListItem } from "react-native-elements";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Avatar, Icon, Image, ListItem } from "react-native-elements";
 import syncStorage from "sync-storage";
 
 function getCampionatiByUtente(setListaCampionati) {
   async function getData() {
     await fetch(
-      config.url.path + "/campionati/myChamp/" + syncStorage.get("utente").id
+      config.url.path +
+        "/classifiche/bestResult/" +
+        syncStorage.get("utente").id
     )
       .then((response) => {
         if (response.status === 200) {
           return response.json();
         } else {
-          console.log("else");
         }
       })
       .then((response) => {
@@ -28,9 +28,8 @@ function getCampionatiByUtente(setListaCampionati) {
   getData();
 }
 
-export default function myChamp({ navigation, route }) {
+export default function myBestResult({ navigation, route }) {
   const [listaCampionati, setListaCampionati] = React.useState([]);
-
   React.useEffect(() => {
     getCampionatiByUtente(setListaCampionati);
     //console.log(listaCampionati);
@@ -43,28 +42,26 @@ export default function myChamp({ navigation, route }) {
         navigation.navigate("Campionati", { campionato: item });
       }}
       bottomDivider
-      containerStyle={{ backgroundColor: "rgba(51, 102, 255,0.5)" }}
-      style={{ backgroundColor: "rgba(51, 102, 255, 0.5)" }}
+      containerStyle={{ backgroundColor: "rgba(51, 102, 255)" }}
+      style={{ backgroundColor: "rgba(51, 102, 255, 0.6)" }}
     >
       <Avatar rounded size={40} source={{ uri: item.logo }}></Avatar>
       <ListItem.Content>
         <ListItem.Title style={styles.testoTitle}>{item.nome}</ListItem.Title>
       </ListItem.Content>
+      <Icon name="trophy" type="font-awesome" color={item.color}></Icon>
       <ListItem.Chevron size={22} />
     </ListItem>
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <FlatList
         renderItem={itemRender}
         data={listaCampionati}
         keyExtractor={(item, index) => index.toString()}
-        style={{
-          backgroundColor: "rgba(51, 102, 255, 0.6)",
-        }}
       />
-    </SafeAreaView>
+    </View>
   );
 }
 

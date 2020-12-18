@@ -28,6 +28,8 @@ import { AppLoading } from "expo";
 import { showMessage } from "react-native-flash-message";
 import * as ImagePicker from "expo-image-picker";
 import { CommonActions } from "@react-navigation/native";
+import * as LocalAuthentication from "expo-local-authentication";
+import myBestResult from "./myBestResult";
 
 let width = Dimensions.get("screen").width;
 let height = Dimensions.get("screen").height;
@@ -195,10 +197,20 @@ const InfoUtente = ({ navigation }) => {
       ...state,
     });
   }
+  //Fingerprint check for device compatibility
+  async function checkDeviceForHardware() {
+    let compatible = await LocalAuthentication.hasHardwareAsync();
+    if (compatible) {
+      console.log("Compatible Device!");
+    } else {
+      console.log("Current device does not have the necessary hardware!");
+    }
+    return compatible;
+  }
   return (
     <SafeAreaView
       style={{
-        backgroundColor: "rgba(51, 102, 255,0.5)",
+        backgroundColor: "rgba(51, 102, 255,0.6)",
       }}
     >
       <ScrollView>
@@ -504,33 +516,35 @@ const InfoUtente = ({ navigation }) => {
           ) : (
             <AppLoading />
           )}
-
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Text style={styles.infoUtenteImpronta}>
-              Login con impronta digitale
-            </Text>
-            <Switch
-              trackColor={{ false: "#767577", true: "#767577" }}
-              thumbColor={isEnabled ? "#02e609" : "#ff4026"}
-              ios_backgroundColor="#3e3e3e"
-              onValueChange={() => {
-                toggleSwitch();
-                if (!isEnabled) {
-                  utenteFingerprint = utente;
-                  utenteFingerprint.enabled = isEnabled;
-                  syncStorage.set("utenteFingerprint", utenteFingerprint);
-                } else syncStorage.remove("utenteFingerprint");
+          {checkDeviceForHardware() ? (
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "center",
+                alignItems: "center",
               }}
-              value={isEnabled}
-            ></Switch>
-          </View>
-
+            >
+              <Text style={styles.infoUtenteImpronta}>
+                Login con impronta digitale
+              </Text>
+              <Switch
+                trackColor={{ false: "#767577", true: "#767577" }}
+                thumbColor={isEnabled ? "#02e609" : "#ff4026"}
+                ios_backgroundColor="#3e3e3e"
+                onValueChange={() => {
+                  toggleSwitch();
+                  if (!isEnabled) {
+                    utenteFingerprint = utente;
+                    utenteFingerprint.enabled = isEnabled;
+                    syncStorage.set("utenteFingerprint", utenteFingerprint);
+                  } else syncStorage.remove("utenteFingerprint");
+                }}
+                value={isEnabled}
+              ></Switch>
+            </View>
+          ) : (
+            <AppLoading />
+          )}
           <View style={styles.buttonRegistrati}>
             <Button
               title={"Salva"}
@@ -543,19 +557,11 @@ const InfoUtente = ({ navigation }) => {
     </SafeAreaView>
   );
 };
-const BestResult = () => {
-  return (
-    <View style={{ backgroundColor: "rgba(51, 102, 255,0.5)", flex: 1 }}>
-      <Text>B</Text>
-    </View>
-  );
-};
 
 const ProfileStack = createStackNavigator();
 const ProfileStackScreen = () => (
   <ProfileStack.Navigator headerMode={"none"}>
-    {/* <RaceStack.Screen name="Home" component={HomeTabNavScreen} /> */}
-    <ProfileStack.Screen name="BestResultUtente" component={BestResult} />
+    <ProfileStack.Screen name="BestResultUtente" component={myBestResult} />
     <ProfileStack.Screen name="Info" component={InfoUtente} />
   </ProfileStack.Navigator>
 );
@@ -581,19 +587,11 @@ const ProfileTabNavScreen = () => (
     <ProfileTabNav.Screen
       name="Info Ed Impostazioni"
       component={InfoUtente}
-      /*       initialParams={{
-        idCampionato: getData("idCampionato"),
-        idGara: getData("gara").idCircuito,
-      }} */
     ></ProfileTabNav.Screen>
     <ProfileTabNav.Screen
       onswipe
       name="My Best"
-      component={BestResult}
-      /*       initialParams={{
-        gara: getData("gara"),
-        campionato: getData("campionato"),
-      }} */
+      component={myBestResult}
     ></ProfileTabNav.Screen>
   </ProfileTabNav.Navigator>
 );
@@ -698,7 +696,7 @@ export default function Profile({ navigation }) {
           marginTop: height > 800 ? 0 : "2%",
         }}
       >
-        <ProfileTabNavScreen></ProfileTabNavScreen>
+        <ProfileTabNavScreen />
       </View>
     </View>
   );

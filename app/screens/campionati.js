@@ -393,6 +393,7 @@ const styles = StyleSheet.create({
     //height: heigth > 800 ? heigth / 3.5 : heigth / 3,
     width: "100%",
     padding: "5%",
+    borderRadius: 15,
   },
   modalContent: { marginTop: "5%" },
   modalTitle: {

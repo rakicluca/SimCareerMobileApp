@@ -26,11 +26,95 @@ import {
 } from "react-native";
 import { Component } from "react";
 import config from "../config/config";
-import Dots from "react-native-dots-pagination";
 import { showMessage } from "react-native-flash-message";
 
 let screenWidth = Dimensions.get("window").width;
 let screenHight = Dimensions.get("window").height;
+
+/* const Indicator = ({ scrollX }) => {
+  const scale1 = scrollX.interpolate({
+    inputRange: [-1 * screenWidth, 0, 1 * screenWidth],
+    outputRange: [0.8, 1.4, 0.8],
+    extrapolate: "clamp",
+  });
+  return (
+    <View
+      style={{
+        flexDirection: "row",
+        borderWidth: 1,
+        flex: 0.5,
+        alignItems: "center",
+      }}
+    >
+      <Animated.View
+        key={"indicator-1"}
+        style={{
+          width: 10,
+          height: 10,
+          borderRadius: 5,
+          backgroundColor: "white",
+          marginHorizontal: 5,
+          transform: [{ scale1 }],
+        }}
+      ></Animated.View>
+      <Animated.View
+        key={"indicator - 2"}
+        style={{
+          width: 10,
+          height: 10,
+          borderRadius: 5,
+          backgroundColor: "white",
+          marginHorizontal: 5,
+          //transform: [{ scale2 }],
+        }}
+      ></Animated.View>
+    </View>
+  );
+}; */
+const PAG_REGISTRAZIONE = [1, 2];
+const Indicator = ({ scrollX }) => {
+  return (
+    <View
+      style={{
+        flexDirection: "row",
+        flex: 0.5,
+        alignItems: "center",
+      }}
+    >
+      {PAG_REGISTRAZIONE.map((_, i) => {
+        const inputRange = [
+          (i - 1) * screenWidth,
+          i * screenWidth,
+          (i + 1) * screenWidth,
+        ];
+        const scale = scrollX.interpolate({
+          inputRange,
+          outputRange: [0.8, 1.4, 0.8],
+          extrapolate: "clamp",
+        });
+        const opacity = scrollX.interpolate({
+          inputRange,
+          outputRange: [0.6, 0.9, 0.6],
+          extrapolate: "clamp",
+        });
+        return (
+          <Animated.View
+            key={"indicator-" + i}
+            style={{
+              width: 10,
+              height: 10,
+              borderRadius: 5,
+              backgroundColor: "white",
+              marginHorizontal: 5,
+              transform: [{ scale }],
+              opacity,
+            }}
+          ></Animated.View>
+        );
+      })}
+    </View>
+  );
+};
 
 export default function RegForm({ navigation }) {
   //Load custom font
@@ -74,6 +158,7 @@ export default function RegForm({ navigation }) {
     dateDisplay: "",
   });
   const { control, errors, handleSubmit, getValues, setValue } = useForm();
+  const scrollX = React.useRef(new Animated.Value(0)).current;
   //OnSubmit Form
   const onSubmit = (data) => {
     try {
@@ -159,6 +244,10 @@ export default function RegForm({ navigation }) {
             pagingEnabled={true}
             scrollEventThrottle={16}
             showsHorizontalScrollIndicator={false}
+            onScroll={Animated.event(
+              [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+              { useNativeDriver: false }
+            )}
           >
             <View style={styles.regform}>
               <Controller
@@ -232,12 +321,16 @@ export default function RegForm({ navigation }) {
               {errors.password && (
                 <Text style={styles.errorText}>{errors.password.message}</Text>
               )}
-              <View style={{ marginTop: screenHight * 0.23 }}>
+              {/*               <View style={{ marginTop: screenHight * 0.23 }}>
                 <Dots length={2} active={0} />
-              </View>
+              </View> */}
             </View>
 
-            <ScrollView showsVerticalScrollIndicator={false}>
+            <ScrollView
+              showsVerticalScrollIndicator
+              persistentScrollbar
+              indicatorStyle={"white"}
+            >
               <View style={styles.regform}>
                 <Controller
                   control={control}
@@ -377,13 +470,14 @@ export default function RegForm({ navigation }) {
                     onPress={handleSubmit(onSubmit)}
                   />
                 </View>
-                <View style={styles.dotStyle}>
+                {/*                 <View style={styles.dotStyle}>
                   <Dots length={2} active={1} />
-                </View>
+                </View> */}
               </View>
             </ScrollView>
           </ScrollView>
         </View>
+        <Indicator scrollX={scrollX}></Indicator>
         {Object.keys(errors).length === 0 && errors.constructor === Object
           ? console.log("vuoto")
           : showMessage({
@@ -419,7 +513,7 @@ const styles = StyleSheet.create({
     color: "white",
   },
   buttonRegistrati: {
-    width: screenWidth / 3,
+    width: screenWidth / 2.5,
     alignSelf: "center",
     marginTop: 18,
   },
