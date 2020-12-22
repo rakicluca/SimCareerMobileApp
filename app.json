@@ -4,24 +4,24 @@
     "slug": "SimCareerApp",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/logo96x96.png",
+    "icon": "./assets/img/icon.png",
     "userInterfaceStyle": "automatic",
     "notification": {
       "androidMode": "default",
       "icon": "./assets/logo96x96.png",
       "color": "#3366ff"
     },
+    "splash": {
+      "image": "./assets/img/splash/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#23A4ED"
+    },
     "android": {
       "useNextNotificationsApi": true,
       "userInterfaceStyle": "dark",
-      "splash": {
-        "mdpi": "./assets/img/splash/drawable-mdpi/splash_mdpi.png",
-        "ldpi": "./assets/img/splash/drawable-ldpi/splash_ldpi.png",
-        "hdpi": "./assets/img/splash/drawable-hdpi/splash_hdpi.png",
-        "xhdpi": "./assets/img/splash/drawable-xhdpi/splash_xhdpi.png",
-        "xxhdpi": "./assets/img/splash/drawable-xxhdpi/splash_xxhdpi.png",
-        "xxxhdpi": "./assets/img/splash/drawable-xxxhdpi/splash_xxxhdpi.png",
-        "resizeMode": "cover"
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/img/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
       }
     },
     "updates": {

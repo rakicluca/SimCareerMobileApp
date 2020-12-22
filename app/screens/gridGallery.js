@@ -5,10 +5,21 @@ import GridList from "react-native-grid-list";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as Sharing from "expo-sharing";
 import { cacheDirectory, downloadAsync } from "expo-file-system";
+import ImageView from "react-native-image-viewing";
+
+function transforToUriFormat(items) {
+  let array = [];
+  items.forEach((element) => {
+    array.push({ uri: element.url });
+  });
+  return array;
+}
 
 export default function GridGallery({ route }) {
   let items = route.params.items;
-  console.log(items);
+  const [visible, setIsVisible] = React.useState(false);
+  const [indexImage, setImageIndex] = React.useState();
+  let images = transforToUriFormat(items);
   let renderItem = ({ item, index }) => (
     <Image
       style={styles.image}
@@ -18,6 +29,10 @@ export default function GridGallery({ route }) {
       onLongPress={async () => {
         const url = await downloadAsync(item.url, cacheDirectory + "tmp.png");
         await Sharing.shareAsync(url.uri);
+      }}
+      onPress={() => {
+        setIsVisible(true);
+        setImageIndex(index);
       }}
     />
   );
@@ -30,6 +45,19 @@ export default function GridGallery({ route }) {
         renderItem={renderItem}
         separatorBorderWidth={2}
         separatorBorderColor={"white"}
+      />
+      <ImageView
+        images={images}
+        imageIndex={indexImage}
+        visible={visible}
+        onRequestClose={() => setIsVisible(false)}
+        onLongPress={async () => {
+          const url = await downloadAsync(
+            images[indexImage].uri,
+            cacheDirectory + "tmp.png"
+          );
+          await Sharing.shareAsync(url.uri);
+        }}
       />
     </SafeAreaView>
   );

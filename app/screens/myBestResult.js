@@ -1,6 +1,12 @@
 import config from "../config/config";
 import React from "react";
-import { View, StyleSheet, FlatList, TouchableOpacity } from "react-native";
+import {
+  View,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  Text,
+} from "react-native";
 import { Avatar, Icon, Image, ListItem } from "react-native-elements";
 import syncStorage from "sync-storage";
 
@@ -27,6 +33,31 @@ function getCampionatiByUtente(setListaCampionati) {
   }
   getData();
 }
+const EmptyList = () => {
+  return (
+    <View
+      style={{
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <Icon
+        name="flag-checkered"
+        type="font-awesome-5"
+        size={150}
+        color="white"
+        style={{ opacity: 0.65 }}
+      ></Icon>
+      <Text style={styles.empty}>
+        Che peccato, non sei ancora finito sul podio!
+      </Text>
+      <Text style={styles.empty}>
+        Continua a migliorare e troverai qui i tuoi risultati migliori
+      </Text>
+    </View>
+  );
+};
 
 export default function myBestResult({ navigation, route }) {
   const [listaCampionati, setListaCampionati] = React.useState([]);
@@ -56,11 +87,15 @@ export default function myBestResult({ navigation, route }) {
 
   return (
     <View style={styles.container}>
-      <FlatList
-        renderItem={itemRender}
-        data={listaCampionati}
-        keyExtractor={(item, index) => index.toString()}
-      />
+      {listaCampionati.length != 0 ? (
+        <FlatList
+          renderItem={itemRender}
+          data={listaCampionati}
+          keyExtractor={(item, index) => index.toString()}
+        />
+      ) : (
+        <EmptyList />
+      )}
     </View>
   );
 }
@@ -78,5 +113,10 @@ const styles = StyleSheet.create({
     color: "white",
     fontFamily: "spyagencycond",
     fontSize: 17,
+  },
+  empty: {
+    opacity: 0.6,
+    color: "white",
+    fontStyle: "italic",
   },
 });

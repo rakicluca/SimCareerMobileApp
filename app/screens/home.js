@@ -26,6 +26,7 @@ import syncStorage from "sync-storage";
 import Gara from "./gara";
 import { useFonts } from "@use-expo/font";
 import { AppLoading } from "expo";
+import { ChampionshipsContext } from "../config/provider";
 let listaPreferiti = new Array();
 
 const ChampionStack = createStackNavigator();
@@ -66,12 +67,13 @@ const HomeTabNavScreen = () => (
 );
 
 const getAllcampionati = ({ navigation }) => {
-  const [listaCampionati, setListaCampionati] = React.useState([]);
+  //const [listaCampionati, setListaCampionati] = React.useState([]);
   const [prefInDB, setprefInDB] = React.useState([]);
   const [refreshing, setRefreshing] = React.useState(false);
   const [isSolid, setisSolid] = React.useState(false);
   const [isSelected, setIsSelected] = React.useState([]);
   const [removePref, setRemovePref] = React.useState([]);
+  const context = React.useContext(ChampionshipsContext);
   React.useEffect(() => {
     //Get Preferiti
     fetch(
@@ -119,7 +121,7 @@ const getAllcampionati = ({ navigation }) => {
           }
         })
         .then((response) => {
-          setListaCampionati(response);
+          context.setListaCampionati(response);
         });
     }
     rememberMeOnLoad();
@@ -193,7 +195,7 @@ const getAllcampionati = ({ navigation }) => {
     try {
       let response = await fetch(config.url.path + "/campionati/");
       let responseJSON = await response.json();
-      setListaCampionati(responseJSON);
+      context.setListaCampionati(responseJSON);
       setRefreshing(false);
     } catch (error) {
       console.error(error);
@@ -202,7 +204,7 @@ const getAllcampionati = ({ navigation }) => {
   return (
     <FlatList
       renderItem={itemRender}
-      data={listaCampionati}
+      data={context.listaCampionati}
       keyExtractor={keyItemLista}
       style={{
         backgroundColor: "rgba(51, 102, 255, 0.6)",

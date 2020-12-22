@@ -26,6 +26,8 @@ import config from "../config/config";
 import Modal from "react-native-modal";
 import DropDownPicker from "react-native-dropdown-picker";
 import syncStorage from "sync-storage";
+import { ChampionshipsContext } from "../config/provider";
+import { showMessage } from "react-native-flash-message";
 
 let width = Dimensions.get("screen").width;
 let height = Dimensions.get("screen").height;
@@ -33,6 +35,28 @@ let height = Dimensions.get("screen").height;
 function getData(dataName) {
   let data = SyncStorage.get(dataName);
   return JSON.parse(data);
+}
+function getCampionatiByUtente(context) {
+  async function getData() {
+    await fetch(
+      config.url.path + "/campionati/myChamp/" + syncStorage.get("utente").id
+    )
+      .then((response) => {
+        if (response.status === 200) {
+          return response.json();
+        } else {
+          console.log("else");
+        }
+      })
+      .then((response) => {
+        //console.log(response);
+        context.setmyListaCampionati(...[response]);
+      })
+      .catch((err) => {
+        console.info(err);
+      });
+  }
+  getData();
 }
 
 async function updateLocalCampionato(idCampionato, setNumeroPartecipanti) {
@@ -195,6 +219,7 @@ export default function Campionati({ navigation, route }) {
   const [isVisible, setIsVisible] = useState(false);
   const [pickedVettura, setPickedVettura] = useState([]);
   const [pickedTeam, setPickedTeam] = useState([]);
+  const context = React.useContext(ChampionshipsContext);
   const [numero_partecipanti, setNumeroPartecipanti] = useState(
     getData("campionato").piloti_iscritti.length
   );
@@ -273,13 +298,26 @@ export default function Campionati({ navigation, route }) {
                     pickedTeam,
                     pickedVettura
                   ).then(() => {
-                    setIsSub(true);
-                    setIsVisible(false);
                     updateLocalCampionato(
                       route.params.campionato.id,
                       setNumeroPartecipanti
-                    );
-                    //navigation.goBack();
+                    )
+                      .then(() => {
+                        getCampionatiByUtente(context);
+                      })
+                      .then(() => {
+                        showMessage({
+                          message:
+                            "Ti sei iscritto correttamente al campionato " +
+                            route.params.campionato.nome,
+                          type: "success",
+                        });
+                        setIsSub(true);
+                        setIsVisible(false);
+                      })
+                      .then(() => {
+                        navigation.goBack();
+                      });
                   });
                 }
               }}
@@ -359,7 +397,19 @@ export default function Campionati({ navigation, route }) {
                   updateLocalCampionato(
                     route.params.campionato.id,
                     setNumeroPartecipanti
-                  );
+                  )
+                    .then(() => {
+                      getCampionatiByUtente(context);
+                    })
+                    .then(() => {
+                      showMessage({
+                        message:
+                          "Ti sei disiscritto correttamente dal campionato " +
+                          route.params.campionato.nome,
+                        type: "success",
+                      });
+                      navigation.goBack();
+                    });
                 });
               }
             }}

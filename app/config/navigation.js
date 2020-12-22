@@ -11,18 +11,19 @@ import Galleria from "../screens/galleria.js";
 import Profilo from "../screens/profilo";
 import GridGallery from "../screens/gridGallery";
 import { Text, Dimensions } from "react-native";
-import { color } from "react-native-reanimated";
-import Campionati from "../screens/campionati.js";
 import FlashMessage from "react-native-flash-message";
+import { ChampionshipsProvider } from "../config/provider.js";
 
 const LoginStack = createStackNavigator();
 const LoginStackScreen = () => (
-  <LoginStack.Navigator headerMode={"none"}>
-    <LoginStack.Screen name="LoginForm" component={LogForm} />
-    <LoginStack.Screen name="RegistrationForm" component={RegForm} />
-    <LoginStack.Screen name="AppTabs" component={AppTabsScreen} />
-    <LoginStack.Screen name="GridGallery" component={GridGallery} />
-  </LoginStack.Navigator>
+  <ChampionshipsProvider>
+    <LoginStack.Navigator headerMode={"none"}>
+      <LoginStack.Screen name="LoginForm" component={LogForm} />
+      <LoginStack.Screen name="RegistrationForm" component={RegForm} />
+      <LoginStack.Screen name="AppTabs" component={AppTabsScreen} />
+      <LoginStack.Screen name="GridGallery" component={GridGallery} />
+    </LoginStack.Navigator>
+  </ChampionshipsProvider>
 );
 
 const AppTabs = createMaterialTopTabNavigator();
