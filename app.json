@@ -22,7 +22,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/img/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "googleServicesFile": "./google-services.json"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
