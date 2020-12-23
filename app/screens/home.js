@@ -55,7 +55,6 @@ const HomeTabNavScreen = () => (
     }}
   >
     <HomeTabNav.Screen
-      onswipe
       name="Campionati"
       component={getAllcampionati}
     ></HomeTabNav.Screen>
@@ -348,7 +347,7 @@ export default function Home({ navigation }) {
   //this method will be called whenever a user interacts with a notification (eg. taps on it).
   Notifications.addNotificationResponseReceivedListener((response) => {
     switch (response.notification.request.content.data.type) {
-      case "campionato":
+      case "Campionati":
         {
           fetch(
             config.url.path +
@@ -362,6 +361,7 @@ export default function Home({ navigation }) {
               syncStorage.set("campionato", JSON.stringify(res));
               syncStorage.set("listagare", JSON.stringify(res.calendario));
               navigation.navigate("Campionati", { campionato: res });
+              syncStorage.remove("NotificaData");
             });
         }
         break;
@@ -384,7 +384,7 @@ export default function Home({ navigation }) {
           } */
         }
         break;
-      case "galleria":
+      case "GridGallery":
         {
           {
             fetch(
@@ -398,6 +398,7 @@ export default function Home({ navigation }) {
               .then((res) => {
                 syncStorage.set("campionato", JSON.stringify(res));
                 navigation.navigate("GridGallery", { items: res.foto });
+                syncStorage.remove("NotificaData");
               });
           }
         }

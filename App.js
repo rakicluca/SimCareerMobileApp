@@ -4,6 +4,7 @@ import "./app/config/globalVariables";
 import SyncStorage from "sync-storage";
 import * as Notifications from "expo-notifications";
 
+//Handler per notifica con app aperta
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -11,7 +12,7 @@ Notifications.setNotificationHandler({
     shouldSetBadge: true,
   }),
   handleSuccess: () => {
-    console.log("SERIO???????????????" + id);
+    console.log("HandleSuccess" + id);
   },
   handleError: (err) => {
     console.log(err);
@@ -19,8 +20,12 @@ Notifications.setNotificationHandler({
 });
 
 //this method will be called whenever a notification is received while the app is running.
-Notifications.addNotificationReceivedListener(() => {
-  console.log("Listener");
+Notifications.addNotificationReceivedListener((response) => {
+  console.log("Listener", response.request.content.data.type);
+});
+
+Notifications.addNotificationResponseReceivedListener((response) => {
+  SyncStorage.set("NotificaData", response.notification.request.content.data);
 });
 
 export default class App extends React.Component {

@@ -32,6 +32,17 @@ import { showMessage } from "react-native-flash-message";
 let screenWidth = Dimensions.get("screen").width;
 let screenHight = Dimensions.get("screen").height;
 
+async function getCampionatoById(idCampionato) {
+  await fetch(config.url.path + "/campionati/" + idCampionato)
+    .then((res) => {
+      return res.json();
+    })
+    .then((res) => {
+      syncStorage.set("campionato", JSON.stringify(res));
+      syncStorage.set("listagare", JSON.stringify(res.calendario));
+    });
+}
+
 const registerForPushNotifications = async (utente) => {
   const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
   if (status !== "granted") {
@@ -163,11 +174,13 @@ export default function LoginForm({ navigation }) {
 
   const onSubmit = () => {
     global.username = getValues("username");
+    let notifica_data = syncStorage.get("NotificaData");
     if (toggleCheckBox) {
       setRememberMe(getValues("username"), getValues("password"));
     } else {
       removeRememberMe();
     }
+    //Login se utente_impronta esiste
     if (utenteFingerprint != undefined) {
       fetch(
         config.url.path +
@@ -196,19 +209,46 @@ export default function LoginForm({ navigation }) {
           if (response) {
             syncStorage.set("utente", response);
             registerForPushNotifications(response);
-            navigation.dispatch(
-              CommonActions.reset({
-                index: 0,
-                routes: [{ name: "AppTabs" }],
-              })
-            );
+            if (notifica_data != undefined) {
+              getCampionatoById(notifica_data.id);
+              navigation.dispatch(
+                CommonActions.reset({
+                  index: 1,
+                  routes: [
+                    { name: "AppTabs" },
+                    {
+                      name: "AppTabs",
+                      params: {
+                        screen: "Home",
+                        params: {
+                          screen: notifica_data.type,
+                          params: {
+                            campionato: JSON.parse(
+                              syncStorage.get("campionato")
+                            ),
+                          },
+                        },
+                      },
+                    },
+                  ],
+                })
+              );
+              syncStorage.remove("NotificaData");
+            } else {
+              navigation.dispatch(
+                CommonActions.reset({
+                  index: 0,
+                  routes: [{ name: "AppTabs" }],
+                })
+              );
+            }
           }
         })
         .catch((er) => {
           console.log(er);
         });
     } else {
-      console.log("dentro");
+      //Login con username e password
       fetch(
         config.url.path +
           "/utenti/" +
@@ -236,12 +276,38 @@ export default function LoginForm({ navigation }) {
           if (response) {
             syncStorage.set("utente", response);
             registerForPushNotifications(response);
-            navigation.dispatch(
-              CommonActions.reset({
-                index: 0,
-                routes: [{ name: "AppTabs" }],
-              })
-            );
+            if (notifica_data != undefined) {
+              getCampionatoById(notifica_data.id);
+              navigation.dispatch(
+                CommonActions.reset({
+                  index: 1,
+                  routes: [
+                    { name: "AppTabs" },
+                    {
+                      name: "AppTabs",
+                      params: {
+                        screen: "Home",
+                        params: {
+                          screen: notifica_data.type,
+                          params: {
+                            campionato: JSON.parse(
+                              syncStorage.get("campionato")
+                            ),
+                          },
+                        },
+                      },
+                    },
+                  ],
+                })
+              );
+            } else {
+              navigation.dispatch(
+                CommonActions.reset({
+                  index: 0,
+                  routes: [{ name: "AppTabs" }],
+                })
+              );
+            }
           }
         })
         .catch((er) => {
