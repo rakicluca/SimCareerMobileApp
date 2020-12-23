@@ -23,12 +23,15 @@
         "foregroundImage": "./assets/img/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "googleServicesFile": "./google-services.json"
+      "googleServicesFile": "./google-services.json",
+      "package": "com.NAISTeam.Wydol.SimCareer"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "userInterfaceStyle": "light"

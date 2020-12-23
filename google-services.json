@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "45339164353",
+    "project_id": "simcareer-c8269",
+    "storage_bucket": "simcareer-c8269.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:45339164353:android:0bb6adda8c5d420ae75e40",
+        "android_client_info": {
+          "package_name": "com.NAISTeam.Wydol.SimCareer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "45339164353-n0pvpckafehubmetad3jds0v32fu5so7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBdQEt9t8k6THXOhEeFe6Y9W4ANk6MwAcc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "45339164353-n0pvpckafehubmetad3jds0v32fu5so7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
