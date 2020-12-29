@@ -187,7 +187,7 @@ export default function LoginForm({ navigation }) {
           "/utenti/" +
           utenteFingerprint.username +
           "/" +
-          utenteFingerprint.password,
+          escape(utenteFingerprint.password),
         {
           method: "GET",
           dataType: "json",
@@ -255,7 +255,7 @@ export default function LoginForm({ navigation }) {
           "/utenti/" +
           getValues("username") +
           "/" +
-          getValues("password"),
+          escape(getValues("password")),
         {
           method: "GET",
           dataType: "json",

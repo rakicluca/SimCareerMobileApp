@@ -172,9 +172,9 @@ export default function RegForm({ navigation }) {
         body: JSON.stringify([
           {
             id: 0,
-            username: data.username,
+            username: escape(data.username),
             email: data.email,
-            password: data.password,
+            password: escape(data.password),
             nome: data.nome,
             cognome: data.cognome,
             data_nascita: data.data,
