@@ -314,9 +314,6 @@ export default function Campionati({ navigation, route }) {
                         });
                         setIsSub(true);
                         setIsVisible(false);
-                      })
-                      .then(() => {
-                        navigation.goBack();
                       });
                   });
                 }
@@ -329,7 +326,6 @@ export default function Campionati({ navigation, route }) {
         style={{
           flexDirection: "row",
           flex: 1.5,
-          marginTop: StatusBar.currentHeight / 1.8,
           justifyContent: "space-evenly",
         }}
       >

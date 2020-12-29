@@ -21,7 +21,7 @@ import {
 import { Avatar, Button } from "react-native-elements";
 import { ListItem } from "react-native-elements";
 import config from "../config/config";
-import Campionati from "./campionati.js";
+import Campionato from "./campionati.js";
 import syncStorage from "sync-storage";
 import Gara from "./gara";
 import { useFonts } from "@use-expo/font";
@@ -33,7 +33,7 @@ const ChampionStack = createStackNavigator();
 const ChampionStackScreen = () => (
   <ChampionStack.Navigator headerMode={"none"}>
     <ChampionStack.Screen name="Home" component={HomeTabNavScreen} />
-    <ChampionStack.Screen name="Campionati" component={Campionati} />
+    <ChampionStack.Screen name="Campionato" component={Campionato} />
     <ChampionStack.Screen name="Gara" component={Gara} />
   </ChampionStack.Navigator>
 );
@@ -48,7 +48,7 @@ const HomeTabNavScreen = () => (
     tabBarOptions={{
       showIcon: true,
       showLabel: "true",
-      style: { paddingTop: 30, backgroundColor: "rgba(51, 102, 255, 1)" },
+      style: { backgroundColor: "rgba(51, 102, 255, 1)" },
       inactiveTintColor: "rgba(255, 255, 255, 0.5)",
       activeTintColor: "white",
       indicatorStyle: { backgroundColor: "white" },
@@ -134,7 +134,7 @@ const getAllcampionati = ({ navigation }) => {
         syncStorage.set("listagare", JSON.stringify(item.calendario));
         syncStorage.set("idCampionato", JSON.stringify(item.id));
         syncStorage.set("campionato", JSON.stringify(item));
-        navigation.push("Campionati", { campionato: item });
+        navigation.push("Campionato", { campionato: item });
       }}
       bottomDivider
       containerStyle={{ backgroundColor: "rgba(51, 102, 255)" }}
@@ -287,7 +287,7 @@ const getPreferiti = ({ navigation }) => {
         height: 72.5,
       }}
       onPress={() => {
-        navigation.push("Campionati", { campionato: item });
+        navigation.push("Campionato", { campionato: item });
       }}
     >
       <Avatar rounded size={40} source={{ uri: item.logo }}></Avatar>
@@ -347,7 +347,7 @@ export default function Home({ navigation }) {
   //this method will be called whenever a user interacts with a notification (eg. taps on it).
   Notifications.addNotificationResponseReceivedListener((response) => {
     switch (response.notification.request.content.data.type) {
-      case "Campionati":
+      case "Campionato":
         {
           fetch(
             config.url.path +
@@ -360,28 +360,9 @@ export default function Home({ navigation }) {
             .then((res) => {
               syncStorage.set("campionato", JSON.stringify(res));
               syncStorage.set("listagare", JSON.stringify(res.calendario));
-              navigation.navigate("Campionati", { campionato: res });
+              navigation.navigate("Campionato", { campionato: res });
               syncStorage.remove("NotificaData");
             });
-        }
-        break;
-      case "gara":
-        {
-          /* 
-          {
-            fetch(
-              config.url.path +
-                "/campionati/" +
-                response.notification.request.content.data.id
-            )
-              .then((res) => {
-                return res.json();
-              })
-              .then((res) => {
-                syncStorage.set("campionato", JSON.stringify(res));
-                navigation.navigate("Gara", { gara: res });
-              });
-          } */
         }
         break;
       case "GridGallery":

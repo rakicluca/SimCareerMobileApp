@@ -27,62 +27,64 @@ function convertToNiceString(listaAuto) {
 
 export default function Home({ route }) {
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: "rgba(51, 102, 255, 0.6)",
-        paddingHorizontal: "2%",
-        alignItems: "center",
-      }}
-    >
-      <View style={styles.infoCampionato}>
-        <Text style={{ color: "white", fontSize: 22, fontWeight: "bold" }}>
-          Informazioni campionato
-        </Text>
-      </View>
-      {route.params.campionato.impostazioni_gioco.map((infoText, key) => {
-        return (
-          <View
-            key={key}
-            style={{
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <View>
-              <Text key={key} style={styles.testo}>
-                {infoText.tipo}:{" "}
-              </Text>
-            </View>
-            <View>
-              <Text key={key + 1} style={styles.testoValore}>
-                {infoText.valore}
-              </Text>
-            </View>
-          </View>
-        );
-      })}
-
-      <View style={styles.listaAuto}>
-        <View style={styles.listaAutoText}>
-          <Text style={styles.testo}>Lista auto:</Text>
+    <ScrollView showsVerticalScrollIndicator={false}>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: "rgba(51, 102, 255, 0.6)",
+          paddingHorizontal: "2%",
+          alignItems: "center",
+        }}
+      >
+        <View style={styles.infoCampionato}>
+          <Text style={{ color: "white", fontSize: 22, fontWeight: "bold" }}>
+            Informazioni campionato
+          </Text>
         </View>
-        <View style={styles.listaAutoValore}>
-          <Text style={styles.testoValore}>
-            {convertToNiceString(route.params.campionato.lista_auto)}
+        {route.params.campionato.impostazioni_gioco.map((infoText, key) => {
+          return (
+            <View
+              key={key}
+              style={{
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <View>
+                <Text key={key} style={styles.testo}>
+                  {infoText.tipo}:{" "}
+                </Text>
+              </View>
+              <View>
+                <Text key={key + 1} style={styles.testoValore}>
+                  {infoText.valore}
+                </Text>
+              </View>
+            </View>
+          );
+        })}
+
+        <View style={styles.listaAuto}>
+          <View style={styles.listaAutoText}>
+            <Text style={styles.testo}>Lista auto:</Text>
+          </View>
+          <View style={styles.listaAutoValore}>
+            <Text style={styles.testoValore}>
+              {convertToNiceString(route.params.campionato.lista_auto)}
+            </Text>
+          </View>
+        </View>
+        <View style={styles.forumLink}>
+          <Text style={styles.testo}>Link forum campionato:</Text>
+          <Text
+            style={styles.urlStyle}
+            onPress={() => Linking.openURL("http://www.simcareer.org/forum/")}
+          >
+            http://www.simcareer.org/forum/
           </Text>
         </View>
       </View>
-      <View style={styles.forumLink}>
-        <Text style={styles.testo}>Link forum campionato:</Text>
-        <Text
-          style={styles.urlStyle}
-          onPress={() => Linking.openURL("http://www.simcareer.org/forum/")}
-        >
-          http://www.simcareer.org/forum/
-        </Text>
-      </View>
-    </View>
+    </ScrollView>
   );
 }
 

@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "SimCareerApp",
+    "name": "Sim Career",
     "slug": "SimCareerApp",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -23,15 +23,14 @@
         "foregroundImage": "./assets/img/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
+      "icon": "./assets/logo96x96.png",
       "googleServicesFile": "./google-services.json",
       "package": "com.NAISTeam.Wydol.SimCareer"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "userInterfaceStyle": "light"

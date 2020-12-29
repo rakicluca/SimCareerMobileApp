@@ -13,6 +13,7 @@ import GridGallery from "../screens/gridGallery";
 import { Text, Dimensions } from "react-native";
 import FlashMessage from "react-native-flash-message";
 import { ChampionshipsProvider } from "../config/provider.js";
+import { StatusBar } from "react-native";
 
 const LoginStack = createStackNavigator();
 const LoginStackScreen = () => (
@@ -91,7 +92,12 @@ const AppTabsScreen = () => (
 
 export default ({ route }) => (
   <NavigationContainer>
+    <StatusBar backgroundColor={"rgb(51, 102, 255)"} />
     <LoginStackScreen />
-    <FlashMessage position="top" />
+    <FlashMessage
+      position="top"
+      icon="auto"
+      style={{ marginTop: "-5%", paddingHorizontal: "6%" }}
+    />
   </NavigationContainer>
 );

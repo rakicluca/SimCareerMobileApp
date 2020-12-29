@@ -210,30 +210,31 @@ export default function LoginForm({ navigation }) {
             syncStorage.set("utente", response);
             registerForPushNotifications(response);
             if (notifica_data != undefined) {
-              getCampionatoById(notifica_data.id);
-              navigation.dispatch(
-                CommonActions.reset({
-                  index: 1,
-                  routes: [
-                    { name: "AppTabs" },
-                    {
-                      name: "AppTabs",
-                      params: {
-                        screen: "Home",
+              getCampionatoById(notifica_data.id).then(() => {
+                navigation.dispatch(
+                  CommonActions.reset({
+                    index: 1,
+                    routes: [
+                      { name: "AppTabs" },
+                      {
+                        name: "AppTabs",
                         params: {
-                          screen: notifica_data.type,
+                          screen: "Home",
                           params: {
-                            campionato: JSON.parse(
-                              syncStorage.get("campionato")
-                            ),
+                            screen: notifica_data.type,
+                            params: {
+                              campionato: JSON.parse(
+                                syncStorage.get("campionato")
+                              ),
+                            },
                           },
                         },
                       },
-                    },
-                  ],
-                })
-              );
-              syncStorage.remove("NotificaData");
+                    ],
+                  })
+                );
+                syncStorage.remove("NotificaData");
+              });
             } else {
               navigation.dispatch(
                 CommonActions.reset({
@@ -300,6 +301,7 @@ export default function LoginForm({ navigation }) {
                   ],
                 })
               );
+              syncStorage.remove("NotificaData");
             } else {
               navigation.dispatch(
                 CommonActions.reset({

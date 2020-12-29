@@ -129,11 +129,12 @@ const InfoUtente = ({ navigation }) => {
   React.useEffect(() => {
     getListaVetture(setListaVetture);
     getListaCircuiti(setListaCircuiti);
-    console.log(width, height);
   }, []);
 
   //OnSubmit Form
   const onSubmit = (data) => {
+    let selectedImage = syncStorage.get("selectedImage");
+    console.log(selectedImage);
     try {
       fetch(config.url.path + "/utenti/" + utente.username, {
         method: "PUT",
@@ -537,7 +538,18 @@ const InfoUtente = ({ navigation }) => {
                     utenteFingerprint = utente;
                     utenteFingerprint.enabled = isEnabled;
                     syncStorage.set("utenteFingerprint", utenteFingerprint);
-                  } else syncStorage.remove("utenteFingerprint");
+                    showMessage({
+                      message: "Funzione attivata con successo!",
+                      type: "success",
+                    });
+                  } else {
+                    showMessage({
+                      message: "Funzione disattivata con successo!",
+                      type: "success",
+                    });
+
+                    syncStorage.remove("utenteFingerprint");
+                  }
                 }}
                 value={isEnabled}
               ></Switch>
@@ -603,6 +615,7 @@ export default function Profile({ navigation }) {
     uri: utente.imgUtente,
     base64: "",
   });
+  syncStorage.set("selectedImage", selectedImage);
   let openImagePickerAsync = async () => {
     let permissionResultRoll = await ImagePicker.requestCameraRollPermissionsAsync();
     let permissionResultCamera = await ImagePicker.requestCameraPermissionsAsync();
@@ -626,6 +639,10 @@ export default function Profile({ navigation }) {
       uri: pickerResult.uri,
       base64: pickerResult.base64,
     });
+    syncStorage.set("selectedImage", {
+      uri: pickerResult.uri,
+      base64: pickerResult.base64,
+    });
     //Clean Up
     return () => {
       setSelectedImage({
@@ -645,7 +662,7 @@ export default function Profile({ navigation }) {
         style={{
           flexDirection: "row",
           flex: 1,
-          marginTop: "10%",
+          marginVertical: "3%",
           justifyContent: "space-evenly",
         }}
       >
@@ -664,6 +681,7 @@ export default function Profile({ navigation }) {
                 borderRadius: height < 732 ? 130 / 2 : 180 / 2,
                 resizeMode: "cover",
               }}
+              key={Date.now()}
               source={{
                 uri: selectedImage.uri,
               }}

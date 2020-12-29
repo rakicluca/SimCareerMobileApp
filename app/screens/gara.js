@@ -31,7 +31,7 @@ const RaceStackScreen = () => (
   <RaceStack.Navigator headerMode={"none"}>
     <RaceStack.Screen name="Home" component={HomeTabNavScreen} />
     <RaceStack.Screen name="Classifica" component={ClassificaGara} />
-    <RaceStack.Screen name="Info" component={InfoGara} />
+    <RaceStack.Screen name="InfoGara" component={InfoGara} />
   </RaceStack.Navigator>
 );
 const HomeTabNav = createMaterialTopTabNavigator();
@@ -77,8 +77,8 @@ export default function Gara({ route }) {
       <View
         style={{
           flexDirection: "row",
-          flex: 1,
-          marginTop: StatusBar.currentHeight,
+          flex: 1.5,
+          justifyContent: "space-evenly",
         }}
       >
         <View
@@ -95,7 +95,6 @@ export default function Gara({ route }) {
               width: height < 732 ? 130 : 160,
               height: height < 732 ? 130 : 160,
               borderRadius: height < 732 ? 130 / 2 : 160 / 2,
-
               resizeMode: "contain",
             }}
             source={{

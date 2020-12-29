@@ -70,7 +70,7 @@ export default function myBestResult({ navigation, route }) {
     <ListItem
       Component={TouchableOpacity}
       onPress={() => {
-        navigation.navigate("Campionati", { campionato: item });
+        navigation.navigate("Campionato", { campionato: item });
       }}
       bottomDivider
       containerStyle={{ backgroundColor: "rgba(51, 102, 255)" }}

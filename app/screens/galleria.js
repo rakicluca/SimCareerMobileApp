@@ -37,8 +37,7 @@ export default function Gallery({ navigation, route }) {
         navigation.push("GridGallery", { items: item.foto });
       }}
       bottomDivider
-      containerStyle={{ backgroundColor: "rgba(51, 102, 255,0.5)" }}
-      style={{ backgroundColor: "rgba(51, 102, 255, 0.5)" }}
+      containerStyle={{ backgroundColor: "rgba(51, 102, 255,0.6)" }}
     >
       <Avatar rounded size={40} source={{ uri: item.logo }}></Avatar>
       <ListItem.Content>
@@ -65,7 +64,6 @@ export default function Gallery({ navigation, route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "rgba(51, 102, 255,0.6)",
   },
   image: {
     width: "100%",
